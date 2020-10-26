@@ -27,7 +27,7 @@ resource "aws_launch_template" "tarball_ingester" {
     truststore_certs                                 = local.tarball_ingester_truststore_certs[local.environment]
     private_key_alias                                = "tarball-ingester"
     internet_proxy                                   = data.terraform_remote_state.ingest.outputs.internet_proxy.host
-    non_proxied_endpoints                            = data.terraform_remote_state.ingest.outputs.no_proxy_list
+    non_proxied_endpoints                            = join(",", data.terraform_remote_state.ingest.outputs.vpc.vpc.no_proxy_list)
     cwa_namespace                                    = local.cw_tarball_ingester_agent_namespace
     cwa_metrics_collection_interval                  = local.cw_agent_metrics_collection_interval
     cwa_cpu_metrics_collection_interval              = local.cw_agent_cpu_metrics_collection_interval
@@ -99,7 +99,7 @@ resource "aws_autoscaling_group" "tarball_ingester" {
   health_check_grace_period = 600
   health_check_type         = "EC2"
   force_delete              = true
-  vpc_zone_identifier       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id
+  vpc_zone_identifier       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id[0]
 
   launch_template {
     id      = aws_launch_template.tarball_ingester.id
@@ -326,7 +326,7 @@ resource "aws_security_group" "tarball_ingester" {
 resource "aws_security_group_rule" "tarball_ingester_to_s3" {
   description       = "Allow Tarball ingester to reach S3"
   type              = "egress"
-  prefix_list_ids   = [data.terraform_remote_state.ingest.outputs.vpc.vpc.vpc.prefix_list_ids.s3]
+  prefix_list_ids   = [data.terraform_remote_state.ingest.outputs.vpc.vpc.prefix_list_ids.s3]
   protocol          = "tcp"
   from_port         = 443
   to_port           = 443

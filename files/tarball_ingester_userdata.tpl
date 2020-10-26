@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Force LC update when any of these files are changed
-echo "${s3_file_tarball_ingestion_logrotate}" > /dev/null
-echo "${s3_file_tarball_ingestion_cloudwatch_sh}" > /dev/null
+echo "${s3_file_tarball_ingester_logrotate}" > /dev/null
+echo "${s3_file_tarball_ingester_cloudwatch_sh}" > /dev/null
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -26,8 +26,8 @@ sleep 5
 /etc/init.d/awsagent start
 
 echo "Configuring startup scripts paths"
-S3_URI_LOGROTATE="s3://${s3_scripts_bucket}/${s3_file_tarball_ingestion_logrotate}"
-S3_CLOUDWATCH_SHELL="s3://${s3_scripts_bucket}/${s3_file_tarball_ingestion_cloudwatch_sh}"
+S3_URI_LOGROTATE="s3://${s3_scripts_bucket}/${s3_file_tarball_ingester_logrotate}"
+S3_CLOUDWATCH_SHELL="s3://${s3_scripts_bucket}/${s3_file_tarball_ingester_cloudwatch_sh}"
 
 echo "Configuring startup file paths"
 mkdir -p /opt/tarball_ingestion/
@@ -66,7 +66,7 @@ acm-cert-retriever \
 --truststore-certs "${truststore_certs}" >> /var/log/acm-cert-retriever.log 2>&1
 
 echo "Retrieving Tarball Ingester artefact..."
-$(which aws) s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingestor_release}.zip
+$(which aws) s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip
 
 echo "Changing permissions and moving files"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion

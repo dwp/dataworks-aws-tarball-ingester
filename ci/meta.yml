@@ -1,5 +1,6 @@
 meta:
   plan:
+
     terraform-common-config:
       config:
         platform: linux
@@ -13,6 +14,7 @@ meta:
           TF_CLI_ARGS_apply: -lock-timeout=300s
           TF_CLI_ARGS_plan: -lock-timeout=300s
           TF_VAR_costcode: ((dataworks.costcode))
+
     terraform-bootstrap:
       task: terraform-bootstrap
       config:
@@ -37,6 +39,7 @@ meta:
           - name: terraform-bootstrap
       params:
         AWS_REGION: eu-west-2
+
     terraform-apply:
       task: terraform-apply
       .: (( inject meta.plan.terraform-common-config ))
@@ -46,6 +49,7 @@ meta:
           args:
             - -exc
             - |
+              export TF_VAR_al2_hardened_ami_id=$(cat ../dw-al2-hardened-ami/id)
               cp ../terraform-bootstrap/terraform.tf .
               terraform workspace show
               terraform init
@@ -55,6 +59,8 @@ meta:
         inputs:
           - name: dataworks-aws-tarball-ingester
           - name: terraform-bootstrap
+          - name: dw-al2-hardened-ami
+
     terraform-plan:
       task: terraform-plan
       .: (( inject meta.plan.terraform-common-config ))
@@ -64,6 +70,7 @@ meta:
           args:
             - -exc
             - |
+              export TF_VAR_al2_hardened_ami_id=$(cat ../dw-al2-hardened-ami/id)
               cp ../terraform-bootstrap/terraform.tf .
               terraform workspace show
               terraform init
@@ -72,6 +79,7 @@ meta:
         inputs:
           - name: dataworks-aws-tarball-ingester
           - name: terraform-bootstrap
+          - name: dw-al2-hardened-ami
       params:
         DETAILED_EXITCODE: -detailed-exitcode
 

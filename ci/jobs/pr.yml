@@ -1,6 +1,8 @@
 jobs:
   - name: dataworks-aws-tarball-ingester-pr
     plan:
+      - get: dataworks-tarball-ingester-release
+        trigger: false
       - get: dataworks-aws-tarball-ingester-pr
         trigger: true
         version: every

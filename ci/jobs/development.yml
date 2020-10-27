@@ -4,6 +4,10 @@ jobs:
     plan:
       - get: dataworks-aws-tarball-ingester
         trigger: true
+      - get: dw-al2-hardened-ami
+        trigger: true
+      - get: dataworks-tarball-ingester-release
+        trigger: true
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-apply ))
       - .: (( inject meta.plan.terraform-plan ))

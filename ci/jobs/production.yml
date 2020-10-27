@@ -8,6 +8,10 @@ jobs:
         trigger: true
         passed:
           - preprod
+      - get: dataworks-tarball-ingester-release
+        trigger: false
+      - get: dw-al2-hardened-ami
+        trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-apply ))
         params:

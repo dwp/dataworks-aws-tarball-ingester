@@ -8,7 +8,7 @@ locals {
     production  = ""
   }
 
-  tarball_ingester_name                = "tarball_ingester"
+  tarball_ingester_name                = "tarball-ingester"
   iam_role_max_session_timeout_seconds = 43200
   cw_tarball_ingester_agent_namespace  = "/app/${local.tarball_ingester_name}"
 

@@ -1,0 +1,10 @@
+
+/var/log/tarball_ingestion/tarball_ingestion.out {
+    copytruncate
+    missingok
+    notifempty
+    maxsize 1024k
+    rotate 10
+    daily
+    create 0640 tarball_ingestion tarball_ingestion
+}

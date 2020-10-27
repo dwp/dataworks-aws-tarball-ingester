@@ -1,13 +1,23 @@
 jobs:
-  - name: development
+  - name: preprod
     max_in_flight: 1
     plan:
       - get: dataworks-aws-tarball-ingester
         trigger: true
+        passed:
+          - integration
       - get: dw-al2-hardened-ami
-        trigger: true
+        trigger: false
+        passed:
+          - integration
       - get: dataworks-tarball-ingester-release
-        trigger: true
+        trigger: false
+        passed:
+          - integration
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-apply ))
+        params:
+          TF_WORKSPACE: 'preprod'
       - .: (( inject meta.plan.terraform-plan ))
+        params:
+          TF_WORKSPACE: 'preprod'

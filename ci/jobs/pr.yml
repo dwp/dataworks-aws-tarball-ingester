@@ -1,6 +1,8 @@
 jobs:
   - name: dataworks-aws-tarball-ingester-pr
     plan:
+      - get: dataworks-tarball-ingester-release
+        trigger: false
       - get: dataworks-aws-tarball-ingester-pr
         trigger: true
         version: every
@@ -8,6 +10,8 @@ jobs:
         params:
           path: dataworks-aws-tarball-ingester-pr
           status: pending
+      - get: dw-al2-hardened-ami
+        trigger: true
       - .: (( inject meta.plan.terraform-bootstrap ))
         input_mapping:
           dataworks-aws-tarball-ingester: dataworks-aws-tarball-ingester-pr

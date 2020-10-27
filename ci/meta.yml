@@ -71,6 +71,7 @@ meta:
             - -exc
             - |
               export TF_VAR_al2_hardened_ami_id=$(cat ../dw-al2-hardened-ami/id)
+              export TF_VAR_tarball_ingester_release=$(cat ../dataworks-tarball-ingester-release/version)
               cp ../terraform-bootstrap/terraform.tf .
               terraform workspace show
               terraform init
@@ -80,6 +81,7 @@ meta:
           - name: dataworks-aws-tarball-ingester
           - name: terraform-bootstrap
           - name: dw-al2-hardened-ami
+          - name: dataworks-tarball-ingester-release
       params:
         DETAILED_EXITCODE: -detailed-exitcode
 

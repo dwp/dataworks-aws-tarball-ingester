@@ -3,7 +3,7 @@ jobs:
     max_in_flight: 1
     plan:
       - get: dataworks-aws-tarball-ingester
-        trigger: false
+        trigger: true
       - get: dw-al2-hardened-ami
         trigger: false
       - get: dataworks-tarball-ingester-release

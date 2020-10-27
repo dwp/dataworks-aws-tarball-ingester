@@ -68,7 +68,9 @@ acm-cert-retriever \
 
 echo "Retrieving Tarball Ingester artefact..."
 aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip \
-    \tmp\dataworks-tarball-ingester-${tarball_ingester_release}.zip
+    /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
+   unzip -d /opt/tarball_ingestion /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
+   chmod u+x /opt/tarball_ingestion/file-transfer.sh
 
 echo "Changing permissions and moving files"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion

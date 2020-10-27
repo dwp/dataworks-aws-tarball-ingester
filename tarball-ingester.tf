@@ -315,7 +315,7 @@ resource "aws_security_group" "tarball_ingester" {
   tags = merge(
     local.common_tags,
     {
-      Name = "tarball_ingester"
+      Name = local.tarball_ingester_name
     },
   )
 }

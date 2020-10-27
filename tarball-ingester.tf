@@ -77,7 +77,8 @@ resource "aws_launch_template" "tarball_ingester" {
       local.common_tags,
       {
         Name        = local.tarball_ingester_name,
-        Persistence = "Ignore"
+        Persistence = "Ignore",
+        SSMEnabled  = local.tarball_ingester_ssmenabled[local.environment]
       },
     )
   }

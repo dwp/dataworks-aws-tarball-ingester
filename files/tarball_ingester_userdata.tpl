@@ -33,8 +33,8 @@ echo "Configuring startup file paths"
 mkdir -p /opt/tarball_ingestion/
 
 echo "Installing startup scripts"
-$(which aws) s3 cp "$S3_URI_LOGROTATE"          /etc/logrotate.d/tarball_ingestion
-$(which aws) s3 cp "$S3_CLOUDWATCH_SHELL"       /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
+aws s3 cp "$S3_URI_LOGROTATE"          /etc/logrotate.d/tarball_ingestion
+aws s3 cp "$S3_CLOUDWATCH_SHELL"       /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
 
 echo "Allow shutting down"
 echo "tarball_ingestion     ALL = NOPASSWD: /sbin/shutdown -h now" >> /etc/sudoers
@@ -44,6 +44,7 @@ mkdir -p /var/log/tarball_ingestion
 
 echo "Creating user tarball_ingestion"
 useradd tarball_ingestion -m
+useradd minio -m
 
 echo "Setup cloudwatch logs"
 chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
@@ -66,7 +67,8 @@ acm-cert-retriever \
 --truststore-certs "${truststore_certs}" >> /var/log/acm-cert-retriever.log 2>&1
 
 echo "Retrieving Tarball Ingester artefact..."
-$(which aws) s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip
+aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip \
+    \tmp\dataworks-tarball-ingester-${tarball_ingester_release}.zip
 
 echo "Changing permissions and moving files"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion

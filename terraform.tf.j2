@@ -32,7 +32,7 @@ data "terraform_remote_state" "certificate_authority" {
 
 data "terraform_remote_state" "ingest" {
   backend   = "s3"
-  workspace = terraform.workspace == "default" ? "default" : "production"
+  workspace = terraform.workspace
 
   config = {
     bucket         = "{{terraform.state_file_bucket}}"

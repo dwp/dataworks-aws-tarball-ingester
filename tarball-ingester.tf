@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "tarball_ingester" {
   tags = merge(
     local.common_tags,
     {
-      Name = "tarball-ingester-cert"
+      Name = "tarball-ingester"
     },
   )
 }

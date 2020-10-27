@@ -38,4 +38,3 @@ resources:
         is-public: false
         state: available
         name: dw-al2-hardened-ami-*
-        image-id: ami-07f0879b525d97930

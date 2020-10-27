@@ -1,5 +1,3 @@
-qa:
-  yml:
 jobs:
   - name: integration
     max_in_flight: 1
@@ -10,8 +8,12 @@ jobs:
           - qa
       - get: dw-al2-hardened-ami
         trigger: false
+        passed:
+          - qa
       - get: dataworks-tarball-ingester-release
         trigger: false
+        passed:
+          - qa
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-apply ))
         params:

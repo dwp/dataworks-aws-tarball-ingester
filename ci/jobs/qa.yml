@@ -1,5 +1,3 @@
-qa:
-  yml:
 jobs:
   - name: qa
     max_in_flight: 1

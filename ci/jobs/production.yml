@@ -1,5 +1,3 @@
-qa:
-  yml:
 jobs:
   - name: production
     max_in_flight: 1
@@ -10,8 +8,12 @@ jobs:
           - preprod
       - get: dataworks-tarball-ingester-release
         trigger: false
+        passed:
+          - preprod
       - get: dw-al2-hardened-ami
         trigger: false
+        passed:
+          - preprod
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-apply ))
         params:

@@ -65,8 +65,7 @@ resource "aws_launch_template" "tarball_ingester" {
   tags = merge(
     local.common_tags,
     {
-      Name        = local.tarball_ingester_name,
-      Persistence = "Ignore"
+      Name = local.tarball_ingester_name,
     },
   )
 
@@ -76,9 +75,10 @@ resource "aws_launch_template" "tarball_ingester" {
     tags = merge(
       local.common_tags,
       {
-        Name        = local.tarball_ingester_name,
-        Persistence = "Ignore",
-        SSMEnabled  = local.tarball_ingester_ssmenabled[local.environment]
+        Name         = local.tarball_ingester_name,
+        Persistence  = "Ignore",
+        AutoShutdown = "False",
+        SSMEnabled   = local.tarball_ingester_ssmenabled[local.environment]
       },
     )
   }
@@ -277,7 +277,12 @@ resource "aws_iam_role" "tarball_ingester" {
   name                 = "tarball_ingester"
   assume_role_policy   = data.aws_iam_policy_document.tarball_ingester_policy.json
   max_session_duration = local.iam_role_max_session_timeout_seconds
-  tags                 = local.common_tags
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "tarball_ingester"
+    },
+  )
 }
 
 resource "aws_iam_policy" "tarball_ingester" {
@@ -304,7 +309,12 @@ resource "aws_iam_role_policy_attachment" "tarball_ingester_ssm" {
 resource "aws_cloudwatch_log_group" "tarball_ingester_logs" {
   name              = "/app/${local.tarball_ingester_name}"
   retention_in_days = 180
-  tags              = local.common_tags
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "/app/${local.tarball_ingester_name}"
+    },
+  )
 }
 
 resource "aws_security_group" "tarball_ingester" {
@@ -404,6 +414,17 @@ resource "aws_s3_bucket_object" "tarball_ingester_cloudwatch_script" {
     local.common_tags,
     {
       Name = "tarball-ingester-cloudwatch-script"
+    },
+  )
+}
+
+resource "aws_secretsmanager_secret" "minio_credentials" {
+  name        = "minio"
+  description = "MinIO credentials"
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "minio",
     },
   )
 }

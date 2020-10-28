@@ -13,13 +13,13 @@ chmod +x /usr/bin/minio
 minio --version
 
 echo "Creating user minio"
-useradd minio -m
+useradd minio -M --shell=/bin/false
 
 echo "Creating MinIO Volume area"
 mkdir -p /opt/minio
 chown -R minio:minio /opt/minio
 
-echo "Creating MinIO Service File"
+echo "Creating MinIO Config File"
 cat <<MINIOCONFIG >> /etc/default/minio
 # Volume to be used for MinIO server.
 MINIO_VOLUMES="/opt/minio"

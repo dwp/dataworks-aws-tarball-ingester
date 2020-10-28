@@ -9,3 +9,6 @@ groups:
   - name: pull-request
     jobs:
       - dataworks-aws-tarball-ingester-pr
+  - name: mirror-minio
+    jobs:
+      - mirror-minio

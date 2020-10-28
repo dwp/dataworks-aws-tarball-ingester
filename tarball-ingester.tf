@@ -399,7 +399,7 @@ resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints" {
   source_security_group_id = data.terraform_remote_state.ingest.outputs.vpc.vpc.interface_vpce_sg_id
 }
 
-resource "aws_security_group_rule" "vpc_endpoints_from_tarball_ingester_to_vpc_endpoints" {
+resource "aws_security_group_rule" "vpc_endpoints_from_tarball_ingester" {
   description              = "Allow HTTPS traffic from Tarball Ingester"
   from_port                = 443
   protocol                 = "tcp"

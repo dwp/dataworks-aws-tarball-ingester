@@ -34,9 +34,11 @@ resource "aws_launch_template" "tarball_ingester" {
     cwa_netstat_metrics_collection_interval          = local.cw_agent_netstat_metrics_collection_interval
     cwa_log_group_name                               = aws_cloudwatch_log_group.tarball_ingester_logs.name
     s3_artefact_bucket                               = data.terraform_remote_state.management_artefact.outputs.artefact_bucket.id
-    s3_scripts_bucket                                = data.terraform_remote_state.common.outputs.config_bucket.id
+    s3_config_bucket                                 = data.terraform_remote_state.common.outputs.config_bucket.id
     s3_file_tarball_ingester_logrotate               = aws_s3_bucket_object.tarball_ingester_logrotate_script.id
     s3_file_tarball_ingester_cloudwatch_sh           = aws_s3_bucket_object.tarball_ingester_cloudwatch_script.id
+    s3_file_tarball_ingester_minio_sh                = aws_s3_bucket_object.tarball_ingester_minio_script.id
+    s3_file_tarball_ingester_minio_service_file      = aws_s3_bucket_object.tarball_ingester_minio_service_file.id
     tarball_ingester_release                         = var.tarball_ingester_release
   }))
 
@@ -306,6 +308,11 @@ resource "aws_iam_role_policy_attachment" "tarball_ingester_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
+resource "aws_iam_role_policy_attachment" "tarball_ingester_minio" {
+  role       = aws_iam_role.tarball_ingester.name
+  policy_arn = aws_iam_policy.minio_credentials_secretsmanager.arn
+}
+
 resource "aws_cloudwatch_log_group" "tarball_ingester_logs" {
   name              = "/app/${local.tarball_ingester_name}"
   retention_in_days = 180
@@ -382,6 +389,26 @@ resource "aws_security_group_rule" "tarball_ingester_ingress_dks" {
   security_group_id        = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
 }
 
+resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints" {
+  description              = "Allow HTTPS traffic to VPC endpoints"
+  from_port                = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.tarball_ingester.id
+  to_port                  = 443
+  type                     = "egress"
+  source_security_group_id = data.terraform_remote_state.ingest.outputs.vpc.vpc.interface_vpce_sg_id
+}
+
+resource "aws_security_group_rule" "vpc_endpoints_from_tarball_ingester" {
+  description              = "Allow HTTPS traffic from Tarball Ingester"
+  from_port                = 443
+  protocol                 = "tcp"
+  security_group_id        = data.terraform_remote_state.ingest.outputs.vpc.vpc.interface_vpce_sg_id
+  to_port                  = 443
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.tarball_ingester.id
+}
+
 data "local_file" "tarball_ingester_logrotate_script" {
   filename = "files/tarball_ingester.logrotate"
 }
@@ -418,6 +445,42 @@ resource "aws_s3_bucket_object" "tarball_ingester_cloudwatch_script" {
   )
 }
 
+data "local_file" "tarball_ingester_minio_script" {
+  filename = "files/tarball_ingester_minio.sh"
+}
+
+resource "aws_s3_bucket_object" "tarball_ingester_minio_script" {
+  bucket     = data.terraform_remote_state.common.outputs.config_bucket.id
+  key        = "component/tarball-ingester/tarball-ingester-minio.sh"
+  content    = data.local_file.tarball_ingester_minio_script.content
+  kms_key_id = data.terraform_remote_state.common.outputs.config_bucket_cmk.arn
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "tarball-ingester-minio-script"
+    },
+  )
+}
+
+data "local_file" "tarball_ingester_minio_service_file" {
+  filename = "files/minio.service"
+}
+
+resource "aws_s3_bucket_object" "tarball_ingester_minio_service_file" {
+  bucket     = data.terraform_remote_state.common.outputs.config_bucket.id
+  key        = "component/tarball-ingester/minio.service"
+  content    = data.local_file.tarball_ingester_minio_service_file.content
+  kms_key_id = data.terraform_remote_state.common.outputs.config_bucket_cmk.arn
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "tarball-ingester-minio-service-file"
+    },
+  )
+}
+
 resource "aws_secretsmanager_secret" "minio_credentials" {
   name        = "minio"
   description = "MinIO credentials"
@@ -427,4 +490,24 @@ resource "aws_secretsmanager_secret" "minio_credentials" {
       Name = "minio",
     },
   )
+}
+
+data "aws_iam_policy_document" "minio_credentials_secretsmanager" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.minio_credentials.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "minio_credentials_secretsmanager" {
+  name        = "MiniIOSecretsManager"
+  description = "Allow reading of MinIO Access and Secret Keys"
+  policy      = data.aws_iam_policy_document.minio_credentials_secretsmanager.json
 }

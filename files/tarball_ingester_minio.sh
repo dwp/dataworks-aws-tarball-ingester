@@ -13,7 +13,7 @@ chmod +x /usr/bin/minio
 minio --version
 
 echo "Creating user minio"
-useradd minio -M --shell=/bin/false
+useradd minio -M --shell=/sbin/nologin
 
 echo "Creating MinIO Volume area"
 mkdir -p /opt/minio

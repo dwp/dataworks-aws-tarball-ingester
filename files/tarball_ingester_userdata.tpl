@@ -3,6 +3,8 @@
 # Force LC update when any of these files are changed
 echo "${s3_file_tarball_ingester_logrotate}" > /dev/null
 echo "${s3_file_tarball_ingester_cloudwatch_sh}" > /dev/null
+echo "${s3_file_tarball_ingester_minio_sh}" > /dev/null
+echo "${s3_file_tarball_ingester_minio_service_file}" > /dev/null
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -26,8 +28,10 @@ sleep 5
 /etc/init.d/awsagent start
 
 echo "Configuring startup scripts paths"
-S3_URI_LOGROTATE="s3://${s3_scripts_bucket}/${s3_file_tarball_ingester_logrotate}"
-S3_CLOUDWATCH_SHELL="s3://${s3_scripts_bucket}/${s3_file_tarball_ingester_cloudwatch_sh}"
+S3_URI_LOGROTATE="s3://${s3_config_bucket}/${s3_file_tarball_ingester_logrotate}"
+S3_CLOUDWATCH_SHELL="s3://${s3_config_bucket}/${s3_file_tarball_ingester_cloudwatch_sh}"
+S3_MINIO_SHELL="s3://${s3_config_bucket}/${s3_file_tarball_ingester_minio_sh}"
+S3_MINIO_SERVICE_FILE="s3://${s3_config_bucket}/${s3_file_tarball_ingester_minio_service_file}"
 
 echo "Configuring startup file paths"
 mkdir -p /opt/tarball_ingestion/
@@ -35,6 +39,8 @@ mkdir -p /opt/tarball_ingestion/
 echo "Installing startup scripts"
 aws s3 cp "$S3_URI_LOGROTATE"          /etc/logrotate.d/tarball_ingestion
 aws s3 cp "$S3_CLOUDWATCH_SHELL"       /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
+aws s3 cp "$S3_MINIO_SHELL"            /opt/tarball_ingestion/tarball_ingestion_minio.sh
+aws s3 cp "$S3_MINIO_SERVICE_FILE"     /etc/systemd/system/minio.service
 
 echo "Allow shutting down"
 echo "tarball_ingestion     ALL = NOPASSWD: /sbin/shutdown -h now" >> /etc/sudoers
@@ -44,7 +50,6 @@ mkdir -p /var/log/tarball_ingestion
 
 echo "Creating user tarball_ingestion"
 useradd tarball_ingestion -m
-useradd minio -m
 
 echo "Setup cloudwatch logs"
 chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
@@ -66,13 +71,17 @@ acm-cert-retriever \
 --truststore-aliases "${truststore_aliases}" \
 --truststore-certs "${truststore_certs}" >> /var/log/acm-cert-retriever.log 2>&1
 
+echo "Setup minio..."
+chmod u+x /opt/tarball_ingestion/tarball_ingestion_minio.sh
+/opt/tarball_ingestion/tarball_ingestion_minio.sh "${s3_artefact_bucket}"
+
 echo "Retrieving Tarball Ingester artefact..."
 aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip \
     /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    unzip -d /opt/tarball_ingestion /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    chmod u+x /opt/tarball_ingestion/file-transfer.sh
 
-echo "Changing permissions and moving files"
+echo "Changing permissions and moving files for tarball ingester"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion
 chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
 

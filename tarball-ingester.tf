@@ -389,7 +389,7 @@ resource "aws_security_group_rule" "tarball_ingester_ingress_dks" {
   security_group_id        = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
 }
 
-resource "aws_security_group_rule" "dataset_generator_to_vpc_endpoints" {
+resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints_to_vpc_endpoints" {
   description              = "Allow HTTPS traffic to VPC endpoints"
   from_port                = 443
   protocol                 = "tcp"
@@ -399,8 +399,8 @@ resource "aws_security_group_rule" "dataset_generator_to_vpc_endpoints" {
   source_security_group_id = data.terraform_remote_state.ingest.outputs.vpc.vpc.interface_vpce_sg_id
 }
 
-resource "aws_security_group_rule" "vpc_endpoints_from_dataset_generator" {
-  description              = "Allow HTTPS traffic from Dataset Generator"
+resource "aws_security_group_rule" "vpc_endpoints_from_tarball_ingester_to_vpc_endpoints" {
+  description              = "Allow HTTPS traffic from Tarball Ingester"
   from_port                = 443
   protocol                 = "tcp"
   security_group_id        = data.terraform_remote_state.ingest.outputs.vpc.vpc.interface_vpce_sg_id

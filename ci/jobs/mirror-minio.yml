@@ -1,0 +1,30 @@
+jobs:
+  - name: mirror-minio
+    plan:
+      - get: aws-management-infrastructure
+      - .: (( inject meta.plan.terraform-output ))
+
+      - task: mirror-minio
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ((dataworks.docker_awscli_repository))
+              version: ((dataworks.docker_awscli_version))
+              tag: ((dataworks.docker_awscli_version))
+          inputs:
+            - name: bucket-name
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.management)):role/ci
+            AWS_DEFAULT_REGION: ((dataworks.aws_region))
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                export AWS_DEFAULT_REGION
+                source /assume-role
+                export BUCKET=`cat bucket-name/bucket-name`
+                curl -O https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
+                aws s3 cp minio.RELEASE.* s3://${BUCKET}/minio/

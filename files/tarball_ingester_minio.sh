@@ -29,6 +29,14 @@ MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
 MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
 MINIOCONFIG
 
+echo "Copying TLS certs for MinIO"
+mkdir -p /home/minio/.minio/certs/CAs
+cp /etc/pki/tls/private/tarball-ingester.key /home/minio/.minio/certs/private.key
+chmod 0600 /home/minio/.minio/certs/private.key
+cp /etc/pki/tls/certs/tarball-ingester.crt /home/minio/.minio/certs/public.crt
+chmod 0600 /home/minio/.minio/certs/public.crt
+chown -R minio:minio /home/minio/.minio
+
 echo "Enabling MinIO Service"
 systemctl enable minio.service
 systemctl start minio.service
@@ -40,7 +48,5 @@ echo "Creating s3://ucfs_business_data_tarballs location in MinIO"
 export AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
 aws configure set default.s3.signature_version s3v4
-
-
 aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://ucfs-business-data-tarballs
 aws --endpoint-url http://127.0.0.1:9000 s3 ls

@@ -389,7 +389,7 @@ resource "aws_security_group_rule" "tarball_ingester_ingress_dks" {
   security_group_id        = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
 }
 
-resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints_to_vpc_endpoints" {
+resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints" {
   description              = "Allow HTTPS traffic to VPC endpoints"
   from_port                = 443
   protocol                 = "tcp"

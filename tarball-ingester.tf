@@ -2,7 +2,6 @@ resource "aws_acm_certificate" "tarball_ingester" {
   certificate_authority_arn = data.terraform_remote_state.certificate_authority.outputs.root_ca.arn
   domain_name               = "${local.tarball_ingester_name}.${local.env_prefix[local.environment]}dataworks.dwp.gov.uk"
 
-
   tags = merge(
     local.common_tags,
     {
@@ -99,7 +98,7 @@ resource "aws_autoscaling_group" "tarball_ingester" {
   health_check_grace_period = 600
   health_check_type         = "EC2"
   force_delete              = true
-  vpc_zone_identifier       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id[0]
+  vpc_zone_identifier       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id
 
   launch_template {
     id      = aws_launch_template.tarball_ingester.id
@@ -409,6 +408,16 @@ resource "aws_security_group_rule" "vpc_endpoints_from_tarball_ingester" {
   source_security_group_id = aws_security_group.tarball_ingester.id
 }
 
+resource "aws_security_group_rule" "tarball_ingester_inbound_healthcheck" {
+  description       = "Allow traffic from LB CIDR for Instance Healthcheck"
+  type              = "ingress"
+  from_port         = 9000
+  to_port           = 9000
+  protocol          = "tcp"
+  cidr_blocks       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.cidr_block
+  security_group_id = aws_security_group.tarball_ingester.id
+}
+
 data "local_file" "tarball_ingester_logrotate_script" {
   filename = "files/tarball_ingester.logrotate"
 }
@@ -510,4 +519,53 @@ resource "aws_iam_policy" "minio_credentials_secretsmanager" {
   name        = "MiniIOSecretsManager"
   description = "Allow reading of MinIO Access and Secret Keys"
   policy      = data.aws_iam_policy_document.minio_credentials_secretsmanager.json
+}
+
+resource "aws_lb" "tarball_ingester" {
+  name               = "tarball-ingester"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id
+  tags               = local.common_tags
+
+  access_logs {
+    bucket  = data.terraform_remote_state.security-tools.outputs.logstore_bucket.id
+    prefix  = "ELBLogs/tarball-ingester"
+    enabled = true
+  }
+}
+
+resource "aws_lb_target_group" "tarball_ingester" {
+  name_prefix = "ti-"
+  port        = 9000
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = data.terraform_remote_state.ingest.outputs.vpc.vpc.vpc.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.common_tags,
+    { Name = "tarball-ingester" },
+  )
+}
+
+resource "aws_autoscaling_attachment" "tarball_ingester" {
+  alb_target_group_arn   = aws_lb_target_group.tarball_ingester.id
+  autoscaling_group_name = aws_autoscaling_group.tarball_ingester.name
+}
+
+resource "aws_lb_listener" "tarball_ingester" {
+  load_balancer_arn = aws_lb.tarball_ingester.arn
+  port              = 443
+  protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2019-08"
+  certificate_arn   = aws_acm_certificate.tarball_ingester.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tarball_ingester.arn
+  }
 }

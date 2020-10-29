@@ -63,4 +63,12 @@ locals {
     management-dev = "management-dev"
     management     = "management"
   }
+
+  permitted_service_consumer_account = {
+    development = local.account[local.environment]
+    qa          = local.account[local.environment]
+    integration = local.account[local.environment]
+    preprod     = local.account[local.environment]
+    production  = local.ucfs_account[local.environment]
+  }
 }

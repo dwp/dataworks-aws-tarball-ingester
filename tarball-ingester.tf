@@ -414,7 +414,7 @@ resource "aws_security_group_rule" "tarball_ingester_inbound_healthcheck" {
   from_port         = 9000
   to_port           = 9000
   protocol          = "tcp"
-  cidr_blocks       = [data.terraform_remote_state.ingest.outputs.ingestion_subnets.cidr_block]
+  cidr_blocks       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.cidr_block
   security_group_id = aws_security_group.tarball_ingester.id
 }
 

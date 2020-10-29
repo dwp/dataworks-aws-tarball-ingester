@@ -414,7 +414,7 @@ resource "aws_security_group_rule" "tarball_ingester_inbound_healthcheck" {
   from_port         = 9000
   to_port           = 9000
   protocol          = "tcp"
-  cidr_blocks       = [data.terraform_remote_state.ingest.outputs.vpc.vpc.vpc.cidr_block]
+  cidr_blocks       = [data.terraform_remote_state.ingest.outputs.ingestion_subnets.cidr_block]
   security_group_id = aws_security_group.tarball_ingester.id
 }
 
@@ -536,12 +536,11 @@ resource "aws_lb" "tarball_ingester" {
 }
 
 resource "aws_lb_target_group" "tarball_ingester" {
-  name_prefix       = "ti-"
-  port              = 9000
-  protocol          = "TCP"
-  target_type       = "instance"
-  vpc_id            = data.terraform_remote_state.ingest.outputs.vpc.vpc.vpc.id
-  proxy_protocol_v2 = true
+  name_prefix = "ti-"
+  port        = 9000
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = data.terraform_remote_state.ingest.outputs.vpc.vpc.vpc.id
 
   lifecycle {
     create_before_destroy = true
@@ -570,26 +569,3 @@ resource "aws_lb_listener" "tarball_ingester" {
     target_group_arn = aws_lb_target_group.tarball_ingester.arn
   }
 }
-
-//resource "aws_acm_certificate_validation" "tarball_ingester" {
-//  certificate_arn         = aws_acm_certificate.tarball_ingester.arn
-//  validation_record_fqdns = [for record in aws_route53_record.tarball_ingester_cert_validation : record.fqdn]
-//}
-//
-//resource "aws_route53_record" "tarball_ingester_cert_validation" {
-//  for_each = {
-//    for dvo in aws_acm_certificate.tarball_ingester.domain_validation_options : dvo.domain_name => {
-//      name   = dvo.resource_record_name
-//      record = dvo.resource_record_value
-//      type   = dvo.resource_record_type
-//    }
-//  }
-//
-//  allow_overwrite = true
-//  name            = each.value.name
-//  records         = [each.value.record]
-//  ttl             = 60
-//  type            = each.value.type
-//  zone_id         = data.terraform_remote_state.management_dns.outputs.dataworks_zone.id
-//  provider        = aws.management_dns
-//}

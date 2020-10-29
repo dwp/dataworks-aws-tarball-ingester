@@ -1,5 +1,5 @@
 resource "aws_vpc_endpoint_service" "tarball_ingester" {
-  acceptance_required        = false
+  acceptance_required        = true
   network_load_balancer_arns = [aws_lb.tarball_ingester.arn]
   tags                       = local.common_tags
 }

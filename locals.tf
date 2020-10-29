@@ -63,4 +63,6 @@ locals {
     management-dev = "management-dev"
     management     = "management"
   }
+
+  ucfs_account_number = "6"
 }

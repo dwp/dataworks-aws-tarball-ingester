@@ -4,7 +4,6 @@ resource "aws_vpc_endpoint_service" "tarball_ingester" {
   tags                       = local.common_tags
 }
 
-data "aws_caller_identity" "current" {}
 
 resource "aws_vpc_endpoint_service_allowed_principal" "tarball_ingester" {
   vpc_endpoint_service_id = aws_vpc_endpoint_service.tarball_ingester.id

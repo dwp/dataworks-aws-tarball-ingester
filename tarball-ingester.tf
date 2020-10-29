@@ -99,6 +99,7 @@ resource "aws_autoscaling_group" "tarball_ingester" {
   health_check_type         = "EC2"
   force_delete              = true
   vpc_zone_identifier       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.id
+  target_group_arns         = [aws_lb_target_group.tarball_ingester.arn]
 
   launch_template {
     id      = aws_launch_template.tarball_ingester.id
@@ -550,11 +551,6 @@ resource "aws_lb_target_group" "tarball_ingester" {
     local.common_tags,
     { Name = "tarball-ingester" },
   )
-}
-
-resource "aws_autoscaling_attachment" "tarball_ingester" {
-  alb_target_group_arn   = aws_lb_target_group.tarball_ingester.id
-  autoscaling_group_name = aws_autoscaling_group.tarball_ingester.name
 }
 
 resource "aws_lb_listener" "tarball_ingester" {

@@ -6,6 +6,9 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: development
       - .: (( inject meta.plan.scale-down ))
         config:
           params:
@@ -18,6 +21,9 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: integration
       - .: (( inject meta.plan.scale-down ))
         config:
           params:
@@ -30,6 +36,9 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: qa
       - .: (( inject meta.plan.scale-down ))
         config:
           params:
@@ -42,6 +51,9 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: preprod
       - .: (( inject meta.plan.scale-down ))
         config:
           params:
@@ -54,6 +66,9 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: production
       - .: (( inject meta.plan.scale-down ))
         config:
           params:

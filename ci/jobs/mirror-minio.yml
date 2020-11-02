@@ -2,7 +2,7 @@ jobs:
   - name: mirror-minio
     plan:
       - get: aws-management-infrastructure
-      - .: (( inject meta.plan.terraform-output ))
+      - .: (( inject meta.plan.terraform-output-management-infra ))
 
       - task: mirror-minio
         config:

@@ -38,6 +38,7 @@ resource "aws_launch_template" "tarball_ingester" {
     s3_file_tarball_ingester_cloudwatch_sh           = aws_s3_bucket_object.tarball_ingester_cloudwatch_script.id
     s3_file_tarball_ingester_minio_sh                = aws_s3_bucket_object.tarball_ingester_minio_script.id
     s3_file_tarball_ingester_minio_service_file      = aws_s3_bucket_object.tarball_ingester_minio_service_file.id
+    minio_s3_bucket_name                             = var.minio_s3_bucket_name
     tarball_ingester_release                         = var.tarball_ingester_release
   }))
 

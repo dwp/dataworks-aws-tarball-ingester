@@ -6,9 +6,6 @@ jobs:
         trigger: false
       - .: (( inject meta.plan.terraform-bootstrap ))
       - .: (( inject meta.plan.terraform-output ))
-        config:
-          params:
-            TF_WORKSPACE: development
       - .: (( inject meta.plan.scale-down ))
         config:
           params:

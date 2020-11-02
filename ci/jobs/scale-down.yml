@@ -1,0 +1,75 @@
+jobs:
+  - name: scale-down-development
+    max_in_flight: 1
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        trigger: false
+      - .: (( inject meta.plan.terraform-bootstrap ))
+      - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: development
+      - .: (( inject meta.plan.scale-down ))
+        config:
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.development)):role/ci
+
+  - name: scale-down-integration
+    max_in_flight: 1
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        trigger: false
+      - .: (( inject meta.plan.terraform-bootstrap ))
+      - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: integration
+      - .: (( inject meta.plan.scale-down ))
+        config:
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.integration)):role/ci
+
+  - name: scale-down-qa
+    max_in_flight: 1
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        trigger: false
+      - .: (( inject meta.plan.terraform-bootstrap ))
+      - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: qa
+      - .: (( inject meta.plan.scale-down ))
+        config:
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.qa)):role/ci
+
+  - name: scale-down-preprod
+    max_in_flight: 1
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        trigger: false
+      - .: (( inject meta.plan.terraform-bootstrap ))
+      - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: preprod
+      - .: (( inject meta.plan.scale-down ))
+        config:
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.preprod)):role/ci
+
+  - name: scale-down-production
+    max_in_flight: 1
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        trigger: false
+      - .: (( inject meta.plan.terraform-bootstrap ))
+      - .: (( inject meta.plan.terraform-output ))
+        config:
+          params:
+            TF_WORKSPACE: production
+      - .: (( inject meta.plan.scale-down ))
+        config:
+          params:
+            AWS_ROLE_ARN: arn:aws:iam::((aws_account.production)):role/ci

@@ -88,8 +88,8 @@ meta:
       params:
         DETAILED_EXITCODE: -detailed-exitcode
 
-    terraform-output:
-      task: terraform-output
+    terraform-output-management-infra:
+      task: terraform-output-management-infra
       .: (( inject meta.plan.terraform-common-config ))
       config:
         params:
@@ -107,3 +107,87 @@ meta:
           - name: aws-management-infrastructure
         outputs:
           - name: bucket-name
+
+    terraform-output:
+      task: terraform-output
+      .: (( inject meta.plan.terraform-common-config ))
+      config:
+        run:
+          path: sh
+          dir: dataworks-aws-tarball-ingester
+          args:
+            - -exc
+            - |
+              cp ../terraform-bootstrap/terraform.tf .
+              terraform init
+              terraform workspace show
+              terraform output tarball_ingester_asg | grep "\"name\" = " | awk '{print $3}' | sed 's/"//g' > ../ingester-asg/name
+        inputs:
+          - name: dataworks-aws-tarball-ingester
+          - name: terraform-bootstrap
+        outputs:
+          - name: ingester-asg
+
+    scale-up:
+      task: scale-up
+      .: (( inject meta.plan.terraform-common-config ))
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: ((dataworks.docker_awscli_repository))
+            version: ((dataworks.docker_awscli_version))
+            tag: ((dataworks.docker_awscli_version))
+        inputs:
+          - name: ingester-asg
+        params:
+          AWS_REGION: ((dataworks.aws_region))
+          AWS_DEFAULT_REGION: ((dataworks.aws_region))
+        run:
+          path: sh
+          args:
+            - -exc
+            - |
+              source /assume-role
+              set +x
+              export ASG_NAME=$(cat ingester-asg/name)
+              echo "Scaling up ${ASG_NAME} to 1..."
+              ASG_SCALING=$(aws autoscaling set-desired-capacity --auto-scaling-group-name ${ASG_NAME} --desired-capacity 1)
+              if $ASG_SCALING; then
+                echo "Scaling successful."
+              else
+                echo "Scaling failed."
+              fi
+
+    scale-down:
+      task: scale-down
+      .: (( inject meta.plan.terraform-common-config ))
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: ((dataworks.docker_awscli_repository))
+            version: ((dataworks.docker_awscli_version))
+            tag: ((dataworks.docker_awscli_version))
+        inputs:
+          - name: ingester-asg
+        params:
+          AWS_REGION: ((dataworks.aws_region))
+          AWS_DEFAULT_REGION: ((dataworks.aws_region))
+        run:
+          path: sh
+          args:
+            - -exc
+            - |
+              source /assume-role
+              set +x
+              export ASG_NAME=$(cat ingester-asg/name)
+              echo "Scaling down ${ASG_NAME} to 0..."
+              ASG_SCALING=$(aws autoscaling set-desired-capacity --auto-scaling-group-name ${ASG_NAME} --desired-capacity 0)
+              if $ASG_SCALING; then
+                echo "Scaling successful."
+              else
+                echo "Scaling failed."
+              fi

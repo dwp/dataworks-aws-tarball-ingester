@@ -55,3 +55,8 @@ variable "tarball_ingester_asg_max" {
     production  = 1
   }
 }
+
+variable "minio_s3_bucket_name" {
+  description = "The name of the S3 bucket created by MinIO"
+  default     = "ucfs-business-data-tarballs"
+}

@@ -48,5 +48,5 @@ echo "Creating s3://ucfs_business_data_tarballs location in MinIO"
 export AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
 aws configure set default.s3.signature_version s3v4
-aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://ucfs-business-data-tarballs
+aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://${2}
 aws --endpoint-url http://127.0.0.1:9000 s3 ls

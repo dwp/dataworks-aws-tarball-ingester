@@ -12,3 +12,6 @@ output "tarball_ingester_fqdn" {
   value = aws_acm_certificate.tarball_ingester.domain_name
 }
 
+output "tarball_ingester_minio_s3_bucket_name" {
+  value = var.minio_s3_bucket_name
+}

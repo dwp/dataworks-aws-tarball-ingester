@@ -59,7 +59,7 @@ chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
     "${cwa_mem_metrics_collection_interval}" "${cwa_netstat_metrics_collection_interval}" "${cwa_log_group_name}" \
     "$AWS_DEFAULT_REGION"
 
-echo "${environment_name}" > /opt/tarball_ingestion/environment\
+echo "${environment_name}" > /opt/tarball_ingestion/environment
 echo "${env_prefix}" > /opt/tarball_ingestion/env_prefix
 
 # Retrieve certificates

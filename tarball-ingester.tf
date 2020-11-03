@@ -555,7 +555,7 @@ resource "aws_lb_target_group" "tarball_ingester" {
   )
 }
 
-resource "aws_lb_listener" "tarball_ingester" {
+resource "aws_lb_listener" "tarball_ingester_listener" {
   load_balancer_arn = aws_lb.tarball_ingester.arn
   port              = 443
   protocol          = "TCP"

@@ -17,6 +17,7 @@ resource "aws_launch_template" "tarball_ingester" {
   vpc_security_group_ids = [aws_security_group.tarball_ingester.id]
 
   user_data = base64encode(templatefile("files/tarball_ingester_userdata.tpl", {
+    env_prefix                                       = local.env_prefix[local.environment]
     environment_name                                 = local.environment
     acm_cert_arn                                     = aws_acm_certificate.tarball_ingester.arn
     truststore_aliases                               = local.tarball_ingester_truststore_aliases[local.environment]

@@ -63,4 +63,12 @@ locals {
     management-dev = "management-dev"
     management     = "management"
   }
+
+  env_dns_prefix = {
+    development = "dev"
+    qa          = "qa"
+    integration = "int"
+    preprod     = "pre"
+    production  = "" # no prefix in prod
+  }
 }

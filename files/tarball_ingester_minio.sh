@@ -44,10 +44,10 @@ systemctl start minio.service
 echo "Waiting for MinIO Service"
 sleep 5
 
-ENVIRONMENT=$(cat /opt/tarball_ingestion/environment)
+ENVIRONMENT=$(cat /opt/tarball_ingestion/env_prefix)
 echo "Setting /etc/hosts for ${ENVIRONMENT}"
 cat <<HOSTSOVERRIDE >> /etc/hosts
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 tarball-ingester.${ENVIRONMENT}.dataworks.dwp.gov.uk
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 tarball-ingester.${ENVIRONMENT}dataworks.dwp.gov.uk
 ::1         localhost6 localhost6.localdomain6
 HOSTSOVERRIDE
 
@@ -55,5 +55,5 @@ echo "Creating s3://ucfs_business_data_tarballs location in MinIO"
 export AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
 aws configure set default.s3.signature_version s3v4
-AWS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt aws --endpoint-url https://tarball-ingester.${ENVIRONMENT}.dataworks.dwp.gov.uk:9000 s3 mb s3://${2}
-AWS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt aws --endpoint-url https://tarball-ingester.${ENVIRONMENT}.dataworks.dwp.gov.uk:9000 s3 ls
+AWS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt aws --endpoint-url https://tarball-ingester.${ENVIRONMENT}dataworks.dwp.gov.uk:9000 s3 mb s3://${2}
+AWS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt aws --endpoint-url https://tarball-ingester.${ENVIRONMENT}dataworks.dwp.gov.uk:9000 s3 ls

@@ -557,9 +557,7 @@ resource "aws_lb_target_group" "tarball_ingester" {
 resource "aws_lb_listener" "tarball_ingester" {
   load_balancer_arn = aws_lb.tarball_ingester.arn
   port              = 443
-  protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2019-08"
-  certificate_arn   = aws_acm_certificate.tarball_ingester.arn
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"

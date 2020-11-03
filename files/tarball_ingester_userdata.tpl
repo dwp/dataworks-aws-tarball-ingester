@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Force LC update when any of these files are changed
-echo "${s3_file_tarball_ingester_logrotate}" > /dev/null
-echo "${s3_file_tarball_ingester_cloudwatch_sh}" > /dev/null
-echo "${s3_file_tarball_ingester_minio_sh}" > /dev/null
-echo "${s3_file_tarball_ingester_minio_service_file}" > /dev/null
+echo "${s3_file_tarball_ingester_logrotate_md5}" > /dev/null
+echo "${s3_file_tarball_ingester_cloudwatch_sh_md5}" > /dev/null
+echo "${s3_file_tarball_ingester_minio_sh_md5}" > /dev/null
+echo "${s3_file_tarball_ingester_minio_service_file_md5}" > /dev/null
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)

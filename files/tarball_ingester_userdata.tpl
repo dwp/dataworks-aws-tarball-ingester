@@ -60,7 +60,6 @@ chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
     "$AWS_DEFAULT_REGION"
 
 echo "${environment_name}" > /opt/tarball_ingestion/environment
-echo "${env_prefix}" > /opt/tarball_ingestion/env_prefix
 
 # Retrieve certificates
 ACM_KEY_PASSWORD=$(uuidgen -r)
@@ -74,7 +73,7 @@ acm-cert-retriever \
 
 echo "Setup minio..."
 chmod u+x /opt/tarball_ingestion/tarball_ingestion_minio.sh
-/opt/tarball_ingestion/tarball_ingestion_minio.sh "${s3_artefact_bucket}" "${minio_s3_bucket_name}"
+/opt/tarball_ingestion/tarball_ingestion_minio.sh "${s3_artefact_bucket}" "${minio_s3_bucket_name}" "${tarball_ingester_endpoint}"
 
 echo "Retrieving Tarball Ingester artefact..."
 aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarball-ingester-${tarball_ingester_release}.zip \

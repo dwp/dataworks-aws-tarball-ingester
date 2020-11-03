@@ -59,6 +59,8 @@ locals {
     }
   )
 
+  tarball_ingester_endpoint = "${local.tarball_ingester_name}.${local.env_prefix[local.environment]}dataworks.dwp.gov.uk"
+
   crypto_workspace = {
     management-dev = "management-dev"
     management     = "management"

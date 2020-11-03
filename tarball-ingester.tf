@@ -17,14 +17,14 @@ resource "aws_launch_template" "tarball_ingester" {
   vpc_security_group_ids = [aws_security_group.tarball_ingester.id]
 
   user_data = base64encode(templatefile("files/tarball_ingester_userdata.tpl", {
-    env_prefix                                       = local.env_prefix[local.environment]
+    tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     environment_name                                 = local.environment
     acm_cert_arn                                     = aws_acm_certificate.tarball_ingester.arn
     truststore_aliases                               = local.tarball_ingester_truststore_aliases[local.environment]
     truststore_certs                                 = local.tarball_ingester_truststore_certs[local.environment]
     private_key_alias                                = "tarball-ingester"
     internet_proxy                                   = data.terraform_remote_state.ingest.outputs.internet_proxy.host
-    non_proxied_endpoints                            = join(",", data.terraform_remote_state.ingest.outputs.vpc.vpc.no_proxy_list)
+    non_proxied_endpoints                            = join(",", data.terraform_remote_state.ingest.outputs.vpc.vpc.no_proxy_list, local.tarball_ingester_endpoint)
     cwa_namespace                                    = local.cw_tarball_ingester_agent_namespace
     cwa_metrics_collection_interval                  = local.cw_agent_metrics_collection_interval
     cwa_cpu_metrics_collection_interval              = local.cw_agent_cpu_metrics_collection_interval

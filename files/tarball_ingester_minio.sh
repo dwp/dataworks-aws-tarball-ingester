@@ -44,7 +44,6 @@ systemctl start minio.service
 echo "Waiting for MinIO Service"
 sleep 5
 
-echo "Setting /etc/hosts for ${ENVIRONMENT}"
 cat <<HOSTSOVERRIDE >> /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 ${3}
 ::1         localhost6 localhost6.localdomain6

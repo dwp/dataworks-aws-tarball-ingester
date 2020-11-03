@@ -176,6 +176,12 @@ locals {
     {%- endfor %}
   }
 
+  ucfs_account = {
+    {%- for key, value in ucfs_accounts.items() %}
+      {{key}} = "{{value}}"
+    {%- endfor %}
+  }
+
   common_tags = {
     {%- for key, value in common_tags.items() %}
       {{key}} = "{{value}}"

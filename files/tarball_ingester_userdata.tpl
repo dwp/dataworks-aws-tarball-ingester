@@ -60,6 +60,7 @@ chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
     "$AWS_DEFAULT_REGION"
 
 echo "${environment_name}" > /opt/tarball_ingestion/environment
+echo "${env_prefix}" > /opt/tarball_ingestion/env_prefix
 
 # Retrieve certificates
 ACM_KEY_PASSWORD=$(uuidgen -r)

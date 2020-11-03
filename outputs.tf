@@ -21,3 +21,9 @@ output "tarball_ingester_endpoint" {
     service_name = aws_vpc_endpoint_service.tarball_ingester.service_name
   }
 }
+
+output "minio_credentials" {
+  value = {
+    arn = aws_secretsmanager_secret.minio_credentials.arn
+  }
+}

@@ -144,6 +144,12 @@ cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<CWAGEN
             "timezone": "UTC"
           },
           {
+            "file_path": "/var/log/cloud-init-output.log",
+            "log_group_name": "${cwa_log_group_name}",
+            "log_stream_name": "cloud-init-output.log",
+            "timezone": "UTC"
+          },
+          {
             "file_path": "/var/log/acm-cert-retriever.log",
             "log_group_name": "${cwa_log_group_name}",
             "log_stream_name": "acm-cert-retriever.log",

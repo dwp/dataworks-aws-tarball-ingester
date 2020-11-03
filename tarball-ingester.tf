@@ -17,13 +17,14 @@ resource "aws_launch_template" "tarball_ingester" {
   vpc_security_group_ids = [aws_security_group.tarball_ingester.id]
 
   user_data = base64encode(templatefile("files/tarball_ingester_userdata.tpl", {
+    tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     environment_name                                 = local.environment
     acm_cert_arn                                     = aws_acm_certificate.tarball_ingester.arn
     truststore_aliases                               = local.tarball_ingester_truststore_aliases[local.environment]
     truststore_certs                                 = local.tarball_ingester_truststore_certs[local.environment]
     private_key_alias                                = "tarball-ingester"
     internet_proxy                                   = data.terraform_remote_state.ingest.outputs.internet_proxy.host
-    non_proxied_endpoints                            = join(",", data.terraform_remote_state.ingest.outputs.vpc.vpc.no_proxy_list)
+    non_proxied_endpoints                            = join(",", data.terraform_remote_state.ingest.outputs.vpc.vpc.no_proxy_list, [local.tarball_ingester_endpoint])
     cwa_namespace                                    = local.cw_tarball_ingester_agent_namespace
     cwa_metrics_collection_interval                  = local.cw_agent_metrics_collection_interval
     cwa_cpu_metrics_collection_interval              = local.cw_agent_cpu_metrics_collection_interval
@@ -35,9 +36,14 @@ resource "aws_launch_template" "tarball_ingester" {
     s3_artefact_bucket                               = data.terraform_remote_state.management_artefact.outputs.artefact_bucket.id
     s3_config_bucket                                 = data.terraform_remote_state.common.outputs.config_bucket.id
     s3_file_tarball_ingester_logrotate               = aws_s3_bucket_object.tarball_ingester_logrotate_script.id
+    s3_file_tarball_ingester_logrotate_md5           = md5(data.local_file.tarball_ingester_logrotate_script.content)
     s3_file_tarball_ingester_cloudwatch_sh           = aws_s3_bucket_object.tarball_ingester_cloudwatch_script.id
+    s3_file_tarball_ingester_cloudwatch_sh_md5       = md5(data.local_file.tarball_ingester_cloudwatch_script.content)
     s3_file_tarball_ingester_minio_sh                = aws_s3_bucket_object.tarball_ingester_minio_script.id
+    s3_file_tarball_ingester_minio_sh_md5            = md5(data.local_file.tarball_ingester_minio_script.content)
     s3_file_tarball_ingester_minio_service_file      = aws_s3_bucket_object.tarball_ingester_minio_service_file.id
+    s3_file_tarball_ingester_minio_service_file_md5  = md5(data.local_file.tarball_ingester_minio_service_file.content)
+    minio_s3_bucket_name                             = var.minio_s3_bucket_name
     tarball_ingester_release                         = var.tarball_ingester_release
   }))
 
@@ -553,12 +559,10 @@ resource "aws_lb_target_group" "tarball_ingester" {
   )
 }
 
-resource "aws_lb_listener" "tarball_ingester" {
+resource "aws_lb_listener" "tarball_ingester_listener" {
   load_balancer_arn = aws_lb.tarball_ingester.arn
   port              = 443
-  protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2019-08"
-  certificate_arn   = aws_acm_certificate.tarball_ingester.arn
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"

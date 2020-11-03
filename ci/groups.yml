@@ -9,6 +9,20 @@ groups:
   - name: pull-request
     jobs:
       - dataworks-aws-tarball-ingester-pr
+  - name: scale-up
+    jobs:
+      - scale-up-development
+      - scale-up-qa
+      - scale-up-integration
+      - scale-up-preprod
+      - scale-up-production
+  - name: scale-down
+    jobs:
+      - scale-down-development
+      - scale-down-qa
+      - scale-down-integration
+      - scale-down-preprod
+      - scale-down-production
   - name: mirror-minio
     jobs:
       - mirror-minio

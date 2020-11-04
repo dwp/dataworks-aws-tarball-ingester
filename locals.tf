@@ -73,4 +73,6 @@ locals {
     preprod     = local.account[local.environment]
     production  = local.ucfs_account[local.environment]
   }
+
+  dks_endpoint = data.terraform_remote_state.crypto.outputs.dks_endpoint[local.environment]
 }

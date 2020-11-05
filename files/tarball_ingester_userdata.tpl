@@ -80,15 +80,43 @@ aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarbal
     /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    unzip -d /opt/tarball_ingestion /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    chmod u+x /opt/tarball_ingestion/file-transfer.sh
+   chmod u+x /opt/tarball_ingestion/steps/copy_collections_to_s3.py
 
 echo "Changing permissions and moving files for tarball ingester"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion
 chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
+
+echo "Installing Python3 for running encryption script"
+yum install -y python3
 
 if [[ "${environment_name}" != "production" ]]; then
     echo "Running script to copy synthetic tarballs..."
     echo "Synthetic tarball script would have run" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 fi
 
-echo "Execute Python script to process data..."
-echo "Process data script would have run" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+echo "Execute Python script to process Incrementals collections data..."
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${source_directory}" \
+    -s3b "${s3_publish_bucket}" \
+    -s3p "${s3_prefix}" \
+    -m "${manifest_path}" \
+    -t "${tmp_dir}" \
+    -d "${dks_url}" \
+    -dt "${date}" \
+    -f Incrementals \
+    -w "${wait_time}" \
+    -i "${interval}" \
+    -a "${asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+
+
+echo "Execute Python script to process Full collections data..."
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${source_directory}" \
+    -s3b "${s3_publish_bucket}" \
+    -s3p "${s3_prefix}" \
+    -m "${manifest_path}" \
+    -t "${tmp_dir}" \
+    -d "${dks_url}" \
+    -dt "${date}" \
+    -f Fulls \
+    -w "${wait_time}" \
+    -i "${interval}" \
+    -a "${asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1

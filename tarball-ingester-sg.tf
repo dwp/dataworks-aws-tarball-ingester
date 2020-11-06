@@ -43,24 +43,24 @@ resource "aws_security_group_rule" "ingress_tarball_ingester_to_internet" {
 }
 
 resource "aws_security_group_rule" "tarball_ingester_egress_dks" {
-  description              = "Allow outbound requests to DKS"
-  type                     = "egress"
-  from_port                = 8443
-  to_port                  = 8443
-  protocol                 = "tcp"
-  source_security_group_id = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
-  security_group_id        = aws_security_group.tarball_ingester.id
+  description       = "Allow outbound requests to DKS"
+  type              = "egress"
+  from_port         = 8443
+  to_port           = 8443
+  protocol          = "tcp"
+  cidr_blocks       = data.terraform_remote_state.crypto.outputs.dks_subnet.cidr_blocks
+  security_group_id = aws_security_group.tarball_ingester.id
 }
 
 resource "aws_security_group_rule" "tarball_ingester_ingress_dks" {
-  provider                 = aws.management-crypto
-  description              = "Allow inbound requests to DKS from Tarball ingester"
-  type                     = "ingress"
-  from_port                = 8443
-  to_port                  = 8443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.tarball_ingester.id
-  security_group_id        = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
+  provider          = aws.management-crypto
+  description       = "Allow inbound requests to DKS from Tarball ingester"
+  type              = "ingress"
+  from_port         = 8443
+  to_port           = 8443
+  protocol          = "tcp"
+  cidr_blocks       = data.terraform_remote_state.ingest.outputs.ingestion_subnets.cidr_block
+  security_group_id = data.terraform_remote_state.crypto.outputs.dks_sg_id[local.environment]
 }
 
 resource "aws_security_group_rule" "tarball_ingester_to_vpc_endpoints" {

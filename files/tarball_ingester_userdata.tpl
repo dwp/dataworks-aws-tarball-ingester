@@ -89,6 +89,7 @@ chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
 
 echo "Installing Python3 for running encryption script"
 yum install -y python3
+pip3 install -r /opt/tarball_ingestion/requirements.txt
 
 if [[ "${environment_name}" != "production" ]]; then
     echo "Running script to copy synthetic tarballs..."

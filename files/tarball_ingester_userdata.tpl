@@ -33,15 +33,19 @@ S3_URI_LOGROTATE="s3://${s3_config_bucket}/${s3_file_tarball_ingester_logrotate}
 S3_CLOUDWATCH_SHELL="s3://${s3_config_bucket}/${s3_file_tarball_ingester_cloudwatch_sh}"
 S3_MINIO_SHELL="s3://${s3_config_bucket}/${s3_file_tarball_ingester_minio_sh}"
 S3_MINIO_SERVICE_FILE="s3://${s3_config_bucket}/${s3_file_tarball_ingester_minio_service_file}"
+S3_MANIFEST_FILE="s3://${s3_config_bucket}/${s3_file_tarball_ingester_manifest_json_file}"
 
 echo "Configuring startup file paths"
 mkdir -p /opt/tarball_ingestion/
+
+TI_MANIFEST_FILE_PATH="/opt/tarball_ingestion/tarball_ingester_manifest.json"
 
 echo "Installing startup scripts"
 aws s3 cp "$S3_URI_LOGROTATE"          /etc/logrotate.d/tarball_ingestion
 aws s3 cp "$S3_CLOUDWATCH_SHELL"       /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
 aws s3 cp "$S3_MINIO_SHELL"            /opt/tarball_ingestion/tarball_ingestion_minio.sh
 aws s3 cp "$S3_MINIO_SERVICE_FILE"     /etc/systemd/system/minio.service
+aws s3 cp "$S3_MANIFEST_FILE"          "$TI_MANIFEST_FILE_PATH"
 
 echo "Allow shutting down"
 echo "tarball_ingestion     ALL = NOPASSWD: /sbin/shutdown -h now" >> /etc/sudoers
@@ -106,7 +110,7 @@ echo "Execute Python script to process Incrementals collections data..."
 python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
     -s3b "${ti_s3_bucket}" \
     -s3p "${ti_s3_prefix}" \
-    -m "${ti_manifest_path}" \
+    -m "$TI_MANIFEST_FILE_PATH" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
     -f "incrementals" \
@@ -119,7 +123,7 @@ echo "Execute Python script to process Full collections data..."
 python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
     -s3b "${ti_s3_bucket}" \
     -s3p "${ti_s3_prefix}" \
-    -m "${ti_manifest_path}" \
+    -m "TI_MANIFEST_FILE_PATH" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
     -f "fulls" \

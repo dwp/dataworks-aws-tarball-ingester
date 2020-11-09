@@ -1,0 +1,17 @@
+{
+  "incrementals": [
+    "mongocsdb-backup00.prod.ucds.io",
+    "mongocclaimdb-backup00.prod.ucds.io",
+    "mongoccdb-backup00.prod.ucds.io",
+    "mongochistdb-backup00.prod.ucds.io",
+    "mongocadb-backup00.prod.ucds.io",
+    "mongoccalcdb-backup00.prod.ucds.io"
+  ],
+  "fulls": [
+    "mongoccalcdb-backup00.prod.ucds.io",
+    "mongocpdb-backup00.prod.ucds.io",
+    "mongocclaimdb-backup00.prod.ucds.io",
+    "mongocsdb-backup00.prod.ucds.io",
+    "mongoccdb-backup00.prod.ucds.io"
+  ]
+}

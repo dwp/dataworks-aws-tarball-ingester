@@ -166,6 +166,18 @@ data "aws_iam_policy_document" "minio_credentials_secretsmanager" {
   }
 }
 
+data "aws_iam_policy_document" "tarball_ingester_describe_autoscaling" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:DescribeAutoScalingInstances",
+    ]
+
+    resources = ["*"]
+  }
+}
+
 resource "aws_iam_policy" "tarball_ingester" {
   name        = "tarball_ingester"
   description = "Policy to allow access for Tarball ingester"
@@ -176,6 +188,12 @@ resource "aws_iam_policy" "minio_credentials_secretsmanager" {
   name        = "MiniIOSecretsManager"
   description = "Allow reading of MinIO Access and Secret Keys"
   policy      = data.aws_iam_policy_document.minio_credentials_secretsmanager.json
+}
+
+resource "aws_iam_policy" "tarball_ingester_describe_autoscaling" {
+  name        = "TarballIngesterDescribeASG"
+  description = "Allow Tarball Ingester Instances to describe their own ASG"
+  policy      = data.aws_iam_policy_document.tarball_ingester_describe_autoscaling.json
 }
 
 resource "aws_iam_role_policy_attachment" "tarball_ingester" {
@@ -196,6 +214,11 @@ resource "aws_iam_role_policy_attachment" "tarball_ingester_ssm" {
 resource "aws_iam_role_policy_attachment" "tarball_ingester_minio" {
   role       = aws_iam_role.tarball_ingester.name
   policy_arn = aws_iam_policy.minio_credentials_secretsmanager.arn
+}
+
+resource "aws_iam_role_policy_attachment" "tarball_ingester_describe_autoscaling" {
+  role       = aws_iam_role.tarball_ingester.name
+  policy_arn = aws_iam_policy.tarball_ingester_describe_autoscaling.arn
 }
 
 resource "aws_iam_role" "tarball_ingester" {

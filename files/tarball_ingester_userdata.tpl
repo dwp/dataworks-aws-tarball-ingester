@@ -5,6 +5,7 @@ echo "${s3_file_tarball_ingester_logrotate_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_cloudwatch_sh_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_minio_sh_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_minio_service_file_md5}" > /dev/null
+echo "${ti_manifest_file_md5}" > /dev/null
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -94,6 +95,12 @@ if [[ "${environment_name}" != "production" ]]; then
     echo "Synthetic tarball script would have run" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 fi
 
+TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
+    --instance-ids $INSTANCE_ID \
+    --region $AWS_DEFAULT_REGION \
+    | grep AutoScalingGroupName | cut -d'"' -f4)
+
+
 echo "Execute Python script to process Incrementals collections data..."
 python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
     -s3b "${ti_s3_bucket}" \
@@ -101,11 +108,10 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}
     -m "${ti_manifest_path}" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
-    -dt "${ti_dt}" \
-    -f "${ti_format}" \
+    -f "incrementals" \
     -w "${ti_wait}" \
     -i "${ti_interval}" \
-    -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 
 
 echo "Execute Python script to process Full collections data..."
@@ -115,8 +121,7 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}
     -m "${ti_manifest_path}" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
-    -dt "${ti_dt}" \
-    -f "${ti_format}" \
+    -f "full" \
     -w "${ti_wait}" \
     -i "${ti_interval}" \
-    -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1

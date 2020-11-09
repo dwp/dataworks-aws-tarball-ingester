@@ -69,3 +69,21 @@ resource "aws_s3_bucket_object" "tarball_ingester_minio_service_file" {
     },
   )
 }
+
+data "local_file" "tarball_ingester_manifest_json" {
+  filename = "files/tarball_ingester_manifest.json"
+}
+
+resource "aws_s3_bucket_object" "tarball_ingester_manifest_json" {
+  bucket     = data.terraform_remote_state.common.outputs.config_bucket.id
+  key        = "component/tarball-ingester/tarball_ingester_manifest.json"
+  content    = data.local_file.tarball_ingester_manifest_json.content
+  kms_key_id = data.terraform_remote_state.common.outputs.config_bucket_cmk.arn
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "tarball-ingester-manifest-json"
+    },
+  )
+}

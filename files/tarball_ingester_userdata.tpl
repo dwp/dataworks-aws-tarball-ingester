@@ -121,7 +121,7 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}
     -m "${ti_manifest_path}" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
-    -f "full" \
+    -f "fulls" \
     -w "${ti_wait}" \
     -i "${ti_interval}" \
     -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1

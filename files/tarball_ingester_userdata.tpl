@@ -95,28 +95,29 @@ if [[ "${environment_name}" != "production" ]]; then
 fi
 
 echo "Execute Python script to process Incrementals collections data..."
-python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${source_directory}" \
-    -s3b "${s3_publish_bucket}" \
-    -s3p "${s3_prefix}" \
-    -m "${manifest_path}" \
-    -t "${tmp_dir}" \
-    -d "${dks_url}" \
-    -dt "${date}" \
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
+    -s3b "${ti_s3_bucket}" \
+    -s3p "${ti_s3_prefix}" \
+    -m "${ti_manifest_path}" \
+    -t "${ti_tmp_dir}" \
+    -d "${dks_endpoint}" \
+    -dt "${ti_dt}" \
     -f Incrementals \
-    -w "${wait_time}" \
-    -i "${interval}" \
-    -a "${asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+    -w "${ti_wait}" \
+    -i "${ti_interval}" \
+    -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 
 
 echo "Execute Python script to process Full collections data..."
-python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${source_directory}" \
-    -s3b "${s3_publish_bucket}" \
-    -s3p "${s3_prefix}" \
-    -m "${manifest_path}" \
-    -t "${tmp_dir}" \
-    -d "${dks_url}" \
-    -dt "${date}" \
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
+    -s3b "${ti_s3_bucket}" \
+    -s3p "${ti_s3_prefix}" \
+    -m "${ti_manifest_path}" \
+    -t "${ti_tmp_dir}" \
+    -d "${dks_endpoint}" \
+    -dt "${ti_dt}" \
     -f Fulls \
-    -w "${wait_time}" \
-    -i "${interval}" \
-    -a "${asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+    -w "${ti_wait}" \
+    -i "${ti_interval}" \
+    -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+s

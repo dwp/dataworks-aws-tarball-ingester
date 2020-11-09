@@ -5,6 +5,7 @@ echo "${s3_file_tarball_ingester_logrotate_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_cloudwatch_sh_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_minio_sh_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_minio_service_file_md5}" > /dev/null
+echo "${ti_manifest_file_md5}" > /dev/null
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -80,15 +81,47 @@ aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarbal
     /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    unzip -d /opt/tarball_ingestion /tmp/dataworks-tarball-ingester-${tarball_ingester_release}.zip
    chmod u+x /opt/tarball_ingestion/file-transfer.sh
+   chmod u+x /opt/tarball_ingestion/steps/copy_collections_to_s3.py
 
 echo "Changing permissions and moving files for tarball ingester"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion
 chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
+
+echo "Installing Python3 for running encryption script"
+yum install -y python3
 
 if [[ "${environment_name}" != "production" ]]; then
     echo "Running script to copy synthetic tarballs..."
     echo "Synthetic tarball script would have run" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 fi
 
-echo "Execute Python script to process data..."
-echo "Process data script would have run" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
+    --instance-ids $INSTANCE_ID \
+    --region $AWS_DEFAULT_REGION \
+    | grep AutoScalingGroupName | cut -d'"' -f4)
+
+
+echo "Execute Python script to process Incrementals collections data..."
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
+    -s3b "${ti_s3_bucket}" \
+    -s3p "${ti_s3_prefix}" \
+    -m "${ti_manifest_path}" \
+    -t "${ti_tmp_dir}" \
+    -d "${dks_endpoint}" \
+    -f "incrementals" \
+    -w "${ti_wait}" \
+    -i "${ti_interval}" \
+    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+
+
+echo "Execute Python script to process Full collections data..."
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
+    -s3b "${ti_s3_bucket}" \
+    -s3p "${ti_s3_prefix}" \
+    -m "${ti_manifest_path}" \
+    -t "${ti_tmp_dir}" \
+    -d "${dks_endpoint}" \
+    -f "fulls" \
+    -w "${ti_wait}" \
+    -i "${ti_interval}" \
+    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1

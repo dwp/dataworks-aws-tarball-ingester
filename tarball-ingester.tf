@@ -17,6 +17,17 @@ resource "aws_launch_template" "tarball_ingester" {
   vpc_security_group_ids = [aws_security_group.tarball_ingester.id]
 
   user_data = base64encode(templatefile("files/tarball_ingester_userdata.tpl", {
+    ti_tmp_dir                                       = local.ti_tmp_dir
+    ti_src_dir                                       = local.ti_src_dir
+    ti_s3_bucket                                     = local.ti_s3_bucket
+    ti_s3_prefix                                     = local.ti_s3_prefix
+    ti_dks_url                                       = local.dks_endpoint
+    ti_format                                        = local.ti_format
+    ti_dt                                            = local.ti_dt
+    ti_wait                                          = local.ti_wait
+    ti_interval                                      = local.ti_interval
+    ti_manifest_path                                 = local.ti_manifest_path
+    ti_asg                                           = aws_autoscaling_group.tarball_ingester.id
     tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     environment_name                                 = local.environment
     acm_cert_arn                                     = aws_acm_certificate.tarball_ingester.arn

@@ -102,7 +102,7 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
     -dt "${ti_dt}" \
-    -f Incrementals \
+    -f "${ti_format}" \
     -w "${ti_wait}" \
     -i "${ti_interval}" \
     -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
@@ -116,8 +116,7 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
     -dt "${ti_dt}" \
-    -f Fulls \
+    -f "${ti_format}" \
     -w "${ti_wait}" \
     -i "${ti_interval}" \
     -a "${ti_asg_name}" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
-s

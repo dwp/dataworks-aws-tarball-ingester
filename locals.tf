@@ -73,4 +73,15 @@ locals {
     preprod     = local.account[local.environment]
     production  = local.ucfs_account[local.environment]
   }
+
+  dks_endpoint = data.terraform_remote_state.crypto.outputs.dks_endpoint[local.environment]
+  ti_tmp_dir = "/tmp/"
+  ti_src_dir = ""
+  ti_s3_bucket = "?"
+  ti_s3_prefix = "/"
+  ti_format = "?"
+  ti_dt = "?"
+  ti_wait = ""
+  ti_interval = "1"
+  ti_manifest_path = ""
 }

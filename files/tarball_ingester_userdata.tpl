@@ -91,6 +91,15 @@ echo "Changing permissions and moving files for tarball ingester"
 chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion
 chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
 
+echo "Setting up source CA"
+cd /etc/pki/ca-trust/source/anchors/
+sudo touch tarball_ingester_ca.pem
+sudo chown tarball_ingestion:tarball_ingestion /etc/pki/tls/private/"${private_key_alias}".key /etc/pki/tls/certs/"${private_key_alias}".crt /etc/pki/ca-trust/source/anchors/tarball_ingester_ca.pem
+TRUSTSTORE_ALIASES="${truststore_aliases}"
+for F in $(echo $TRUSTSTORE_ALIASES | sed "s/,/ /g"); do
+ (sudo cat "$F.crt"; echo) >> tarball_ingester_ca.pem;
+done
+
 echo "Installing Python3 for running encryption script"
 yum install -y python3
 pip3 install -r /opt/tarball_ingestion/requirements.txt

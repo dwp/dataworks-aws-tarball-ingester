@@ -24,7 +24,6 @@ resource "aws_launch_template" "tarball_ingester" {
     ti_dks_url                                       = local.dks_endpoint
     ti_wait                                          = local.ti_wait
     ti_interval                                      = local.ti_interval
-    ti_manifest_path                                 = aws_s3_bucket_object.tarball_ingester_manifest_json.key
     ti_manifest_file_md5                             = md5(data.local_file.tarball_ingester_manifest_json.content)
     tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     dks_endpoint                                     = local.dks_endpoint
@@ -53,6 +52,7 @@ resource "aws_launch_template" "tarball_ingester" {
     s3_file_tarball_ingester_minio_sh_md5            = md5(data.local_file.tarball_ingester_minio_script.content)
     s3_file_tarball_ingester_minio_service_file      = aws_s3_bucket_object.tarball_ingester_minio_service_file.id
     s3_file_tarball_ingester_minio_service_file_md5  = md5(data.local_file.tarball_ingester_minio_service_file.content)
+    s3_file_tarball_ingester_manifest_json_file      = aws_s3_bucket_object.tarball_ingester_manifest_json.id
     minio_s3_bucket_name                             = var.minio_s3_bucket_name
     tarball_ingester_release                         = var.tarball_ingester_release
   }))

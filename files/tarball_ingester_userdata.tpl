@@ -105,18 +105,17 @@ TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
     --region $AWS_DEFAULT_REGION \
     | grep AutoScalingGroupName | cut -d'"' -f4)
 
-
-echo "Execute Python script to process Incrementals collections data..."
-python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
-    -s3b "${ti_s3_bucket}" \
-    -s3p "${ti_s3_prefix}" \
-    -m "$TI_MANIFEST_FILE_PATH" \
-    -t "${ti_tmp_dir}" \
-    -d "${dks_endpoint}" \
-    -f "incrementals" \
-    -w "${ti_wait}" \
-    -i "${ti_interval}" \
-    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+# Leaving in places for when we do want incrementals
+# python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
+#     -s3b "${ti_s3_bucket}" \
+#     -s3p "${ti_s3_prefix}" \
+#     -m "$TI_MANIFEST_FILE_PATH" \
+#     -t "${ti_tmp_dir}" \
+#     -d "${dks_endpoint}" \
+#     -f "incrementals" \
+#     -w "${ti_wait}" \
+#     -i "${ti_interval}" \
+#     -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
 
 
 echo "Execute Python script to process Full collections data..."

@@ -30,6 +30,21 @@ data "terraform_remote_state" "management_dns" {
   }
 }
 
+data "terraform_remote_state" "mgmt_ca" {
+  backend   = "s3"
+  workspace = local.management_account[local.environment]
+
+  config = {
+    bucket         = "{{terraform.state_file_bucket}}"
+    key            = "terraform/dataworks/aws-certificate-authority.tfstate"
+    region         = "{{terraform.state_file_region}}"
+    encrypt        = true
+    kms_key_id     = "arn:aws:kms:{{terraform.state_file_region}}:{{terraform.state_file_account}}:key/{{terraform.state_file_kms_key}}"
+    dynamodb_table = "remote_state_locks"
+
+  }
+}
+
 data "terraform_remote_state" "certificate_authority" {
   backend   = "s3"
   workspace = terraform.workspace

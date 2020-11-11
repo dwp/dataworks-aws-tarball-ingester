@@ -17,6 +17,7 @@ export HTTPS_PROXY="$https_proxy"
 export no_proxy="${non_proxied_endpoints},${dks_endpoint}"
 export NO_PROXY="$no_proxy"
 
+echo "$no_proxy"
 echo "Configure AWS Inspector"
 cat > /etc/init.d/awsagent.env << AWSAGENTPROXYCONFIG
 export https_proxy=$https_proxy
@@ -88,8 +89,8 @@ aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarbal
    chmod u+x /opt/tarball_ingestion/steps/copy_collections_to_s3.py
 
 echo "Changing permissions and moving files for tarball ingester"
-chown tarball_ingestion:tarball_ingestion -R  /opt/tarball_ingestion
-chown tarball_ingestion:tarball_ingestion -R  /var/log/tarball_ingestion
+chown tarball_ingester:tarball_ingester -R  /opt/tarball_ingestion
+chown tarball_ingester:tarball_ingester -R  /var/log/tarball_ingestion
 
 echo "Installing Python3 for running encryption script"
 yum install -y python3
@@ -119,13 +120,14 @@ TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
 
 
 echo "Execute Python script to process Full collections data..."
-python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
-    -s3b "${ti_s3_bucket}" \
-    -s3p "${ti_s3_prefix}" \
-    -m "$TI_MANIFEST_FILE_PATH" \
-    -t "${ti_tmp_dir}" \
-    -d "${dks_endpoint}" \
-    -f "fulls" \
-    -w "${ti_wait}" \
-    -i "${ti_interval}" \
-    -a "$TI_ASG_NAME" >> /var/log/tarball_ingestion/tarball_ingestion.out 2>&1
+su -p tarball_ingester -c "python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py \
+    -s ${ti_src_dir} \
+    -s3b ${ti_s3_bucket} \
+    -s3p ${ti_s3_prefix} \
+    -m $TI_MANIFEST_FILE_PATH \
+    -t ${ti_tmp_dir} \
+    -d ${dks_endpoint} \
+    -f fulls \
+    -w ${ti_wait} \
+    -i ${ti_interval} \
+    -a $TI_ASG_NAME >> /var/log/tarball_ingestion/tarball_ingestion.out" &

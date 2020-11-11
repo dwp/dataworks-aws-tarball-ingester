@@ -122,7 +122,7 @@ echo "Execute Python script to process Full collections data..."
 python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
     -s3b "${ti_s3_bucket}" \
     -s3p "${ti_s3_prefix}" \
-    -m "TI_MANIFEST_FILE_PATH" \
+    -m "$TI_MANIFEST_FILE_PATH" \
     -t "${ti_tmp_dir}" \
     -d "${dks_endpoint}" \
     -f "fulls" \

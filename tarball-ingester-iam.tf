@@ -111,6 +111,35 @@ data "aws_iam_policy_document" "tarball_ingester" {
   }
 
   statement {
+    sid = "AllowPutToHTMEBucket"
+    actions = [
+      "s3:DeleteObject*",
+      "s3:PutObject"
+    ]
+    resources = ["${data.terraform_remote_state.internal_compute.outputs.htme_s3_bucket.arn}/*"]
+  }
+
+  statement {
+    sid = "AllowListHTMEBucket"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [data.terraform_remote_state.internal_compute.outputs.htme_s3_bucket.arn]
+  }
+
+  statement {
+    sid = "AllowKMSEncryptionOfHTMEBucketObject"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
+    ]
+    resources = [data.terraform_remote_state.internal_compute.outputs.compaction_bucket_cmk.arn]
+  }
+
+  statement {
     sid       = "AllowPullFromArtefactBucket"
     effect    = "Allow"
     actions   = ["s3:GetObject"]

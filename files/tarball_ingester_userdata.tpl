@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Force LC update when any of these files are changed
+# Force LC update when one of these files are changed
 echo "${s3_file_tarball_ingester_logrotate_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_cloudwatch_sh_md5}" > /dev/null
 echo "${s3_file_tarball_ingester_minio_sh_md5}" > /dev/null
@@ -14,7 +14,7 @@ export http_proxy="http://${internet_proxy}:3128"
 export HTTP_PROXY="$http_proxy"
 export https_proxy="$http_proxy"
 export HTTPS_PROXY="$https_proxy"
-export no_proxy="${non_proxied_endpoints},${dks_endpoint}"
+export no_proxy="${non_proxied_endpoints},${dks_fqdn}"
 export NO_PROXY="$no_proxy"
 
 echo "$no_proxy"
@@ -54,9 +54,6 @@ echo "tarball_ingestion     ALL = NOPASSWD: /sbin/shutdown -h now" >> /etc/sudoe
 echo "Creating directories"
 mkdir -p /var/log/tarball_ingestion
 
-echo "Creating user tarball_ingestion"
-useradd tarball_ingestion -m
-
 echo "Setup cloudwatch logs"
 chmod u+x /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh
 /opt/tarball_ingestion/tarball_ingestion_cloudwatch.sh \
@@ -88,10 +85,6 @@ aws s3 cp s3://${s3_artefact_bucket}/dataworks-tarball-ingester/dataworks-tarbal
    chmod u+x /opt/tarball_ingestion/file-transfer.sh
    chmod u+x /opt/tarball_ingestion/steps/copy_collections_to_s3.py
 
-echo "Changing permissions and moving files for tarball ingester"
-chown tarball_ingester:tarball_ingester -R  /opt/tarball_ingestion
-chown tarball_ingester:tarball_ingester -R  /var/log/tarball_ingestion
-
 echo "Installing Python3 for running encryption script"
 yum install -y python3
 pip3 install -r /opt/tarball_ingestion/requirements.txt
@@ -120,7 +113,7 @@ TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
 
 
 echo "Execute Python script to process Full collections data..."
-su -p tarball_ingester -c "python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py \
+python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py \
     -s ${ti_src_dir} \
     -s3b ${ti_s3_bucket} \
     -s3p ${ti_s3_prefix} \
@@ -130,4 +123,4 @@ su -p tarball_ingester -c "python3 /opt/tarball_ingestion/steps/copy_collections
     -f fulls \
     -w ${ti_wait} \
     -i ${ti_interval} \
-    -a $TI_ASG_NAME >> /var/log/tarball_ingestion/tarball_ingestion.out" &
+    -a $TI_ASG_NAME >> /var/log/tarball_ingestion/tarball_ingestion.out &

@@ -75,9 +75,10 @@ locals {
   }
 
   dks_endpoint = data.terraform_remote_state.crypto.outputs.dks_endpoint[local.environment]
+  dks_fqdn     = data.terraform_remote_state.crypto.outputs.dks_fqdn[local.environment]
 
   ti_tmp_dir  = "./tmp/"
   ti_src_dir  = "/opt/minio/ucfs-business-data-tarballs/"
   ti_wait     = "540"
-  ti_interval = "5"
+  ti_interval = "1"
 }

@@ -27,6 +27,7 @@ resource "aws_launch_template" "tarball_ingester" {
     ti_manifest_file_md5                             = md5(data.local_file.tarball_ingester_manifest_json.content)
     tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     dks_endpoint                                     = local.dks_endpoint
+    dks_fqdn                                         = local.dks_fqdn
     environment_name                                 = local.environment
     acm_cert_arn                                     = aws_acm_certificate.tarball_ingester.arn
     truststore_aliases                               = local.tarball_ingester_truststore_aliases[local.environment]

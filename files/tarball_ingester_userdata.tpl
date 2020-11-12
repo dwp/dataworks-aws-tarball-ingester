@@ -17,7 +17,6 @@ export HTTPS_PROXY="$https_proxy"
 export no_proxy="${non_proxied_endpoints},${dks_fqdn}"
 export NO_PROXY="$no_proxy"
 
-echo "$no_proxy"
 echo "Configure AWS Inspector"
 cat > /etc/init.d/awsagent.env << AWSAGENTPROXYCONFIG
 export https_proxy=$https_proxy

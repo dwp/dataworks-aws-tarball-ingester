@@ -70,7 +70,7 @@ resource "aws_launch_template" "tarball_ingester" {
     ebs {
       volume_size           = var.tarball_ingester_ebs_volume_size[local.environment]
       volume_type           = "io1"
-      iops                  = "2000"
+      iops                  = var.tarball_ingester_ebs_iops[local.environment]
       delete_on_termination = true
       encrypted             = true
     }

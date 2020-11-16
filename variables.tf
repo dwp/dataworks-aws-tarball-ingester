@@ -68,6 +68,17 @@ variable "tarball_ingester_ebs_volume_size" {
 }
 
 
+variable "tarball_ingester_ebs_iops" {
+  description = "Tarball ingester EBS IOPs."
+  default = {
+    development = "200"
+    qa          = "200"
+    integration = "5000"
+    preprod     = "5000"
+    production  = "5000"
+  }
+}
+
 variable "minio_s3_bucket_name" {
   description = "The name of the S3 bucket created by MinIO"
   default     = "ucfs-business-data-tarballs"

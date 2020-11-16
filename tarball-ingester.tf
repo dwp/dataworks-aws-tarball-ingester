@@ -68,7 +68,7 @@ resource "aws_launch_template" "tarball_ingester" {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size           = 1000
+      volume_size           = var.tarball_ingester_ebs_volume_size[local.environment]
       volume_type           = "io1"
       iops                  = "2000"
       delete_on_termination = true

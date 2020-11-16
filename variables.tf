@@ -56,6 +56,18 @@ variable "tarball_ingester_asg_max" {
   }
 }
 
+variable "tarball_ingester_ebs_volume_size" {
+  description = "Tarball ingester EBS volume size."
+  default = {
+    development = "20"
+    qa          = "20"
+    integration = "2500"
+    preprod     = "2500"
+    production  = "2500"
+  }
+}
+
+
 variable "minio_s3_bucket_name" {
   description = "The name of the S3 bucket created by MinIO"
   default     = "ucfs-business-data-tarballs"

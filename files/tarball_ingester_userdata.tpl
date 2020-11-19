@@ -125,5 +125,5 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py \
     -w ${ti_wait} \
     -i ${ti_interval} \
     -a $TI_ASG_NAME \
-    --cert '/etc/pki/tls/certs/tarball-ingester.crt'
+    --cert '/etc/pki/tls/certs/tarball-ingester.crt' \
     --key '/etc/pki/tls/private/tarball-ingester.key' >> /var/log/tarball_ingestion/tarball_ingestion.out &

@@ -98,6 +98,8 @@ TI_ASG_NAME=$(aws autoscaling describe-auto-scaling-instances \
     --region $AWS_DEFAULT_REGION \
     | grep AutoScalingGroupName | cut -d'"' -f4)
 
+export REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+
 # Leaving in places for when we do want incrementals
 # python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py -s "${ti_src_dir}" \
 #     -s3b "${ti_s3_bucket}" \
@@ -122,4 +124,6 @@ python3 /opt/tarball_ingestion/steps/copy_collections_to_s3.py \
     -f fulls \
     -w ${ti_wait} \
     -i ${ti_interval} \
-    -a $TI_ASG_NAME >> /var/log/tarball_ingestion/tarball_ingestion.out &
+    -a $TI_ASG_NAME \
+    --cert '/etc/pki/tls/certs/tarball-ingester.crt' \
+    --key '/etc/pki/tls/private/tarball-ingester.key' >> /var/log/tarball_ingestion/tarball_ingestion.out &

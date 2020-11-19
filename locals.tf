@@ -30,9 +30,9 @@ locals {
   tarball_ingester_truststore_aliases = {
     development = "dataworks_root_ca,dataworks_mgt_root_ca"
     qa          = "dataworks_root_ca,dataworks_mgt_root_ca"
-    integration = "dataworks_root_ca,dataworks_mgt_root_ca,ucfs_ca"
-    preprod     = "dataworks_root_ca,dataworks_mgt_root_ca,ucfs_ca"
-    production  = "dataworks_root_ca,dataworks_mgt_root_ca,ucfs_ca,ucfs_ca_old"
+    integration = "dataworks_root_ca,dataworks_mgt_root_ca"
+    preprod     = "dataworks_root_ca,dataworks_mgt_root_ca"
+    production  = "dataworks_root_ca,dataworks_mgt_root_ca,ucfs_ca"
   }
 
   tarball_ingester_truststore_certs = {

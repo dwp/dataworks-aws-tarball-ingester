@@ -207,6 +207,17 @@ data "aws_iam_policy_document" "tarball_ingester_describe_autoscaling" {
   }
 }
 
+data "aws_iam_policy_document" "tarball_ingester_set_desired_capacity_autoscaling" {
+  statement {
+    sid    = "AllowSetDesiredCapacityOnASG"
+    actions = [
+      "autoscaling:SetDesiredCapacity",
+    ]
+
+    resources = ["*"]
+  }
+}
+
 resource "aws_iam_policy" "tarball_ingester" {
   name        = "tarball_ingester"
   description = "Policy to allow access for Tarball ingester"
@@ -223,6 +234,12 @@ resource "aws_iam_policy" "tarball_ingester_describe_autoscaling" {
   name        = "TarballIngesterDescribeASG"
   description = "Allow Tarball Ingester Instances to describe their own ASG"
   policy      = data.aws_iam_policy_document.tarball_ingester_describe_autoscaling.json
+}
+
+resource "aws_iam_policy" "tarball_ingester_set_desired_capacity_autoscaling" {
+  name        = "TarballIngesterSetDesiredCapacityASG"
+  description = "Allow Tarball Ingester Instances to set desired capacity on ASG"
+  policy      = data.aws_iam_policy_document.tarball_ingester_set_desired_capacity_autoscaling.json
 }
 
 resource "aws_iam_role_policy_attachment" "tarball_ingester" {
@@ -248,6 +265,11 @@ resource "aws_iam_role_policy_attachment" "tarball_ingester_minio" {
 resource "aws_iam_role_policy_attachment" "tarball_ingester_describe_autoscaling" {
   role       = aws_iam_role.tarball_ingester.name
   policy_arn = aws_iam_policy.tarball_ingester_describe_autoscaling.arn
+}
+
+resource "aws_iam_role_policy_attachment" "tarball_ingester_set_desired_capacity_autoscaling" {
+  role       = aws_iam_role.tarball_ingester.name
+  policy_arn = aws_iam_policy.tarball_ingester_set_desired_capacity_autoscaling.arn
 }
 
 resource "aws_iam_role" "tarball_ingester" {

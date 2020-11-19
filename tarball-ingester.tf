@@ -20,7 +20,7 @@ resource "aws_launch_template" "tarball_ingester" {
     ti_tmp_dir                                       = local.ti_tmp_dir
     ti_src_dir                                       = local.ti_src_dir
     ti_s3_bucket                                     = data.terraform_remote_state.ingest.outputs.s3_buckets.htme_bucket
-    ti_s3_prefix                                     = data.terraform_remote_state.ingest.outputs.s3_buckets.htme_prefix
+    ti_s3_prefix                                     = "businessdata/tarball-mongo/ucdata"
     ti_dks_url                                       = local.dks_endpoint
     ti_wait                                          = local.ti_wait
     ti_interval                                      = local.ti_interval

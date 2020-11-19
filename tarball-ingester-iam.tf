@@ -214,7 +214,7 @@ data "aws_iam_policy_document" "tarball_ingester_set_desired_capacity_autoscalin
       "autoscaling:SetDesiredCapacity",
     ]
 
-    resources = ["*"]
+    resources = [aws_autoscaling_group.tarball_ingester.arn]
   }
 }
 

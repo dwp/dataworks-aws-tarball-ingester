@@ -209,7 +209,7 @@ data "aws_iam_policy_document" "tarball_ingester_describe_autoscaling" {
 
 data "aws_iam_policy_document" "tarball_ingester_set_desired_capacity_autoscaling" {
   statement {
-    sid    = "AllowSetDesiredCapacityOnASG"
+    sid = "AllowSetDesiredCapacityOnASG"
     actions = [
       "autoscaling:SetDesiredCapacity",
     ]

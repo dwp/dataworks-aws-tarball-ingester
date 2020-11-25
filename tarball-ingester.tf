@@ -2,6 +2,10 @@ resource "aws_acm_certificate" "tarball_ingester" {
   certificate_authority_arn = data.terraform_remote_state.certificate_authority.outputs.root_ca.arn
   domain_name               = "${local.tarball_ingester_name}.${local.env_prefix[local.environment]}dataworks.dwp.gov.uk"
 
+  options {
+    certificate_transparency_logging_preference = "ENABLED"
+  }
+
   tags = merge(
     local.common_tags,
     {

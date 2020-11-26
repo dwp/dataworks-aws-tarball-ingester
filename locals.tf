@@ -62,7 +62,7 @@ locals {
   tarball_ingester_uc_connected = {
     development = false
     qa          = false
-    integration = false
+    integration = true
     preprod     = true
     production  = true
   }

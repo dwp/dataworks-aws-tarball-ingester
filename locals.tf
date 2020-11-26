@@ -51,6 +51,22 @@ locals {
     production  = "False"
   }
 
+  tarball_ingester_stub_enabled = {
+    development = true
+    qa          = true
+    integration = true
+    preprod     = true
+    production  = false
+  }
+
+  tarball_ingester_uc_connected = {
+    development = false
+    qa          = false
+    integration = true
+    preprod     = true
+    production  = true
+  }
+
   tarball_ingester_tags_asg = merge(
     local.common_tags,
     {
@@ -64,14 +80,6 @@ locals {
   crypto_workspace = {
     management-dev = "management-dev"
     management     = "management"
-  }
-
-  permitted_service_consumer_account = {
-    development = local.account[local.environment]
-    qa          = local.account[local.environment]
-    integration = local.account[local.environment]
-    preprod     = local.account[local.environment]
-    production  = local.ucfs_account[local.environment]
   }
 
   dks_endpoint = data.terraform_remote_state.crypto.outputs.dks_endpoint[local.environment]

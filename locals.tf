@@ -59,6 +59,14 @@ locals {
     production  = false
   }
 
+  tarball_ingester_uc_connected = {
+    development = false
+    qa          = false
+    integration = false
+    preprod     = true
+    production  = true
+  }
+
   tarball_ingester_tags_asg = merge(
     local.common_tags,
     {

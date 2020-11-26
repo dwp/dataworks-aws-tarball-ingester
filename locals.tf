@@ -92,10 +92,10 @@ locals {
 
 
   ti_shutdown = {
-    development = true
-    qa          = false
-    integration = true
-    preprod     = true
-    production  = true
+    development = "--shutdown"
+    qa          = ""
+    integration = "--shutdown"
+    preprod     = "--shutdown"
+    production  = "--shutdown"
   }
 }

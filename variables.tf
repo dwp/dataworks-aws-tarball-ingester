@@ -75,7 +75,7 @@ variable "tarball_ingester_ebs_iops" {
     qa          = "200"
     integration = "5000"
     preprod     = "5000"
-    production  = "5000"
+    production  = "8000"
   }
 }
 

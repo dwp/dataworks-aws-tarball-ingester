@@ -29,6 +29,7 @@ resource "aws_launch_template" "tarball_ingester" {
     ti_wait                                          = local.ti_wait
     ti_interval                                      = local.ti_interval
     ti_manifest_file_md5                             = md5(data.local_file.tarball_ingester_manifest_json.content)
+    ti_shutdown                                      = local.ti_shutdown[local.environment]
     tarball_ingester_endpoint                        = local.tarball_ingester_endpoint
     dks_endpoint                                     = local.dks_endpoint
     dks_fqdn                                         = local.dks_fqdn

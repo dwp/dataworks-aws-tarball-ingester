@@ -7,5 +7,11 @@ resource "aws_vpc_endpoint_service" "tarball_ingester" {
 
 resource "aws_vpc_endpoint_service_allowed_principal" "tarball_ingester" {
   vpc_endpoint_service_id = aws_vpc_endpoint_service.tarball_ingester.id
-  principal_arn           = format("arn:aws:iam::%s:root", local.permitted_service_consumer_account[local.environment])
+  principal_arn           = format("arn:aws:iam::%s:root", local.ucfs_account[local.environment])
+}
+
+resource "aws_vpc_endpoint_service_allowed_principal" "tarball_ingester_stub" {
+  count                   = local.tarball_ingester_stub_enabled[local.environment] ? 1 : 0
+  vpc_endpoint_service_id = aws_vpc_endpoint_service.tarball_ingester.id
+  principal_arn           = format("arn:aws:iam::%s:root", local.account[local.environment])
 }

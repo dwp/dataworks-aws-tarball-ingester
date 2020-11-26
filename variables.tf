@@ -59,8 +59,8 @@ variable "tarball_ingester_asg_max" {
 variable "tarball_ingester_ebs_volume_size" {
   description = "Tarball ingester EBS volume size."
   default = {
-    development = "20"
-    qa          = "20"
+    development = "2500"
+    qa          = "2500"
     integration = "2500"
     preprod     = "2500"
     production  = "2500"
@@ -71,11 +71,11 @@ variable "tarball_ingester_ebs_volume_size" {
 variable "tarball_ingester_ebs_iops" {
   description = "Tarball ingester EBS IOPs."
   default = {
-    development = "200"
-    qa          = "200"
-    integration = "5000"
-    preprod     = "5000"
-    production  = "5000"
+    development = "8000"
+    qa          = "8000"
+    integration = "8000"
+    preprod     = "8000"
+    production  = "8000"
   }
 }
 

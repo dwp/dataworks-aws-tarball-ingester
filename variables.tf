@@ -71,10 +71,10 @@ variable "tarball_ingester_ebs_volume_size" {
 variable "tarball_ingester_ebs_iops" {
   description = "Tarball ingester EBS IOPs."
   default = {
-    development = "200"
-    qa          = "200"
-    integration = "5000"
-    preprod     = "5000"
+    development = "8000"
+    qa          = "8000"
+    integration = "8000"
+    preprod     = "8000"
     production  = "8000"
   }
 }

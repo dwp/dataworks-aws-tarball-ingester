@@ -59,8 +59,8 @@ variable "tarball_ingester_asg_max" {
 variable "tarball_ingester_ebs_volume_size" {
   description = "Tarball ingester EBS volume size."
   default = {
-    development = "20"
-    qa          = "20"
+    development = "2500"
+    qa          = "2500"
     integration = "2500"
     preprod     = "2500"
     production  = "2500"

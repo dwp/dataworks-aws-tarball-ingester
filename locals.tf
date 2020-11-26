@@ -89,4 +89,13 @@ locals {
   ti_src_dir  = "/opt/minio/ucfs-business-data-tarballs/"
   ti_wait     = "540"
   ti_interval = "1"
+
+
+  ti_shutdown = {
+    development = true
+    qa          = false
+    integration = true
+    preprod     = true
+    production  = true
+  }
 }

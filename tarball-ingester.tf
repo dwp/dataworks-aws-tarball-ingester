@@ -81,6 +81,10 @@ resource "aws_launch_template" "tarball_ingester" {
     }
   }
 
+  monitoring {
+    enabled = true
+  }
+
   lifecycle {
     create_before_destroy = true
   }

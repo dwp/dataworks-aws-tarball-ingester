@@ -21,11 +21,11 @@ variable "al2_hardened_ami_id" {
 
 variable "tarball_ingester_ec2_size" {
   default = {
-    development = "t3.medium"
-    qa          = "t3.medium"
-    integration = "t3.medium"
-    preprod     = "t3.medium"
-    production  = "t3.medium"
+    development = "c5.large"
+    qa          = "c5.large"
+    integration = "c5.large"
+    preprod     = "c5.large"
+    production  = "c5.large"
   }
 }
 

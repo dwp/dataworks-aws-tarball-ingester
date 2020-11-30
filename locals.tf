@@ -92,7 +92,7 @@ locals {
 
 
   ti_shutdown = {
-    development = "--shutdown"
+    development = ""
     qa          = ""
     integration = ""
     preprod     = "--shutdown"

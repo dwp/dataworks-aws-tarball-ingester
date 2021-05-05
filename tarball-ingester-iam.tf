@@ -254,7 +254,7 @@ resource "aws_iam_role_policy_attachment" "tarball_ingester_cwasp" {
 
 resource "aws_iam_role_policy_attachment" "tarball_ingester_ssm" {
   role       = aws_iam_role.tarball_ingester.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "tarball_ingester_minio" {

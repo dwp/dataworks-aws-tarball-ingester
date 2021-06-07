@@ -23,7 +23,7 @@ resource "aws_launch_template" "tarball_ingester" {
   user_data = base64encode(templatefile("files/tarball_ingester_userdata.tpl", {
     ti_tmp_dir                                       = local.ti_tmp_dir
     ti_src_dir                                       = local.ti_src_dir
-    ti_s3_bucket                                     = data.terraform_remote_state.ingest.outputs.s3_buckets.htme_bucket
+    ti_s3_bucket                                     = data.terraform_remote_state.internal_compute.outputs.htme_s3_bucket.id
     ti_s3_prefix                                     = "businessdata/tarball-mongo/ucdata"
     ti_dks_url                                       = local.dks_endpoint
     ti_wait                                          = local.ti_wait

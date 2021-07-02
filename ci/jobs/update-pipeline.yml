@@ -1,0 +1,29 @@
+jobs:
+  - name: update-pipeline
+    plan:
+      - get: dataworks-aws-tarball-ingester
+        resource: dataworks-aws-tarball-ingester-update-pipeline
+        trigger: true
+      - task: aviator
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ((dataworks.docker_aviator_repository))
+              version: ((dataworks.docker_aviator_version))
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                sed -i 's/fly/nofly/' aviator.yml
+                /usr/bin/aviator -f aviator.yml
+                mv aviator_pipeline.yml ../pipeline
+            dir: dataworks-aws-tarball-ingester
+          inputs:
+            - name: dataworks-aws-tarball-ingester
+          outputs:
+            - name: pipeline
+      - set_pipeline: dataworks-aws-tarball-ingester
+        file: pipeline/aviator_pipeline.yml

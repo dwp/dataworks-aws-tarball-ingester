@@ -26,3 +26,6 @@ groups:
   - name: mirror-minio
     jobs:
       - mirror-minio
+  - name: update-pipeline
+    jobs:
+      - update-pipeline
